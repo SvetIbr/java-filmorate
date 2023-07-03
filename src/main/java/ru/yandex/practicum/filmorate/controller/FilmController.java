@@ -75,41 +75,34 @@ public class FilmController {
         if (film == null) {
             throw new ValidationException("Фильм = null");
         }
-        if (film.getId() > 0) {
-            log.error("Попытка добавить фильм со своим идентификатором " +
-                    "(при создании генерируется автоматически)");
-            throw new ValidationException("Фильм не должен иметь идентификатора " +
-                    "(при создании генерируется автоматически)");
+        if (film.getName().isEmpty()
+                || film.getName().isBlank()
+                || film.getName() == null) {
+            log.error("Название фильма пустое");
+            throw new ValidationException("Название фильма не может быть пустым");
         }
-            if (film.getName().isEmpty()
-                    || film.getName().isBlank()
-                    || film.getName() == null) {
-                log.error("Название фильма пустое");
-                throw new ValidationException("Название фильма не может быть пустым");
-
-            }
-            if (film.getDescription() == null
-                    || film.getDescription().length() > 200
-                    || film.getDescription().isEmpty()) {
-                log.error("Описание фильма больше 200 символов");
-                throw new ValidationException("Длина описания фильма не может быть более 200 символов");
-            }
-            if (film.getDuration() <= 0) {
-                log.error("Продолжительность фильма меньше или равна 0");
-                throw new ValidationException("Продолжительность фильма не может быть меньше или равна 0");
-            }
-            if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(START_OF_ANY_RELEASE_DATE)) {
-                log.error("Дата релиза фильма раньше 28 декабря 1985");
-                throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1895 года");
-            }
+        if (film.getDescription() == null
+                || film.getDescription().length() > 200
+                || film.getDescription().isEmpty()) {
+            log.error("Описание фильма больше 200 символов");
+            throw new ValidationException("Длина описания фильма не может быть более 200 символов");
         }
+        if (film.getDuration() <= 0) {
+            log.error("Продолжительность фильма меньше или равна 0");
+            throw new ValidationException("Продолжительность фильма не может быть меньше или равна 0");
+        }
+        if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(START_OF_ANY_RELEASE_DATE)) {
+            log.error("Дата релиза фильма раньше 28 декабря 1985");
+            throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1895 года");
+        }
+    }
 
 
-        private void validateForUpdate(Film film) {
-            if (!films.containsKey(film.getId())) {
-                log.error("Фильма с таким идентификатором нет");
-                throw new ValidationException("Идентификатор фильма не найден");
-            }
+    private void validateForUpdate(Film film) {
+        if (!films.containsKey(film.getId())) {
+            log.error("Фильма с таким идентификатором нет");
+            throw new ValidationException("Идентификатор фильма не найден");
         }
+    }
 
 }

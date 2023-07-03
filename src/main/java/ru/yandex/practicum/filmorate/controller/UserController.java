@@ -29,9 +29,9 @@ public class UserController {
     public ResponseEntity<User> createUser(@RequestBody User user) {
         try {
             if (user.getId() > 0) {
-                log.error("Попытка добавить фильм со своим идентификатором " +
+                log.error("Попытка добавить пользователя со своим идентификатором " +
                         "(при создании генерируется автоматически)");
-                throw new ValidationException("Фильм не должен иметь идентификатора " +
+                throw new ValidationException("Пользователь не должен иметь идентификатора " +
                         "(при создании генерируется автоматически)");
             }
             validateUser(user);
@@ -66,7 +66,7 @@ public class UserController {
     }
 
     @DeleteMapping
-    public ResponseEntity<HttpStatus> deleteAllFilms() {
+    public ResponseEntity<HttpStatus> deleteAllUsers() {
         users.clear();
         numberId = 1;
         return new ResponseEntity<>(HttpStatus.OK);
@@ -84,9 +84,7 @@ public class UserController {
             throw new ValidationException("Email пользователя не может быть пустым " +
                     "и должен содержать \"@\"");
         }
-        if (user.getLogin().isEmpty()
-                || user.getLogin().isBlank()
-                || user.getLogin().contains(" ")) {
+        if (user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
             log.error("Логин пользователя пустой или содержит пробелы");
             throw new ValidationException("Логин пользователя не может быть пустым " +
                     "и не должен содержать пробелы");
