@@ -13,6 +13,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Класс контроллера для работы с пользователями
+ *
+ * @author Светлана Ибраева
+ * @version 1.0
+ */
 @Slf4j
 @RestController
 @RequestMapping("/users")
@@ -20,11 +26,24 @@ public class UserController {
     private final Map<Integer, User> users = new HashMap<>();
     private static int numberId = 1;
 
+    /**
+     * Метод получения всего списка пользователя из памяти контроллера через запрос
+     *
+     * @return список всех пользователей и код ответа API
+     */
     @GetMapping
     public ResponseEntity<List<User>> findAllUsers() {
         return new ResponseEntity<>(new ArrayList<>(users.values()), HttpStatus.OK);
     }
 
+    /**
+     * Метод добавления объекта user в память контроллера через запрос
+     *
+     * @param user пользователь
+     * @return копию объекта user с добавленным id и код ответа API
+     * @throws ValidationException если объект не прошел валидацию
+     * @see Class #User
+     */
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
         try {
@@ -48,6 +67,13 @@ public class UserController {
         }
     }
 
+    /**
+     * Метод обновления объекта user через запрос
+     *
+     * @param user пользователь
+     * @return копию объекта user с обновленными полями и код ответа API
+     * @throws ValidationException если объект не прошел валидацию
+     */
     @PutMapping
     public ResponseEntity<User> updateUser(@RequestBody User user) {
         try {
@@ -65,6 +91,11 @@ public class UserController {
         }
     }
 
+    /**
+     * Метод очищения списка всех пользователей в  памяти контроллера через запрос
+     *
+     * @return код ответа API
+     */
     @DeleteMapping
     public ResponseEntity<HttpStatus> deleteAllUsers() {
         users.clear();

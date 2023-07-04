@@ -13,6 +13,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Класс контроллера для работы с фильмами
+ *
+ * @author Светлана Ибраева
+ * @version 1.0
+ */
 @Slf4j
 @RestController
 @RequestMapping("/films")
@@ -22,11 +28,23 @@ public class FilmController {
     private static int numberId = 1;
     private static final LocalDate START_OF_ANY_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
+    /**
+     * Метод получения всего списка фильмов из памяти контроллера через запрос
+     *
+     * @return список всех фильмов и код ответа API
+     */
     @GetMapping
     public ResponseEntity<List<Film>> findAllFilms() {
         return new ResponseEntity<>(new ArrayList<>(films.values()), HttpStatus.OK);
     }
 
+    /**
+     * Метод добавления объекта film в память контроллера через запрос
+     *
+     * @param film фильм
+     * @return копию объекта фильм с добавленным id и код ответа API
+     * @throws ValidationException если объект не прошел валидацию
+     */
     @PostMapping
     public ResponseEntity<Film> createFilm(@RequestBody Film film) {
         try {
@@ -47,6 +65,13 @@ public class FilmController {
         }
     }
 
+    /**
+     * Метод обновления объекта film через запрос
+     *
+     * @param film фильм
+     * @return копию объекта film с обновленными полями и код ответа API
+     * @throws ValidationException если объект не прошел валидацию
+     */
     @PutMapping
     public ResponseEntity<Film> updateFilm(@RequestBody Film film) {
         try {
@@ -64,6 +89,11 @@ public class FilmController {
         }
     }
 
+    /**
+     * Метод очищения списка всех фильмов в  памяти контроллера через запрос
+     *
+     * @return код ответа API
+     */
     @DeleteMapping
     public ResponseEntity<HttpStatus> deleteAllFilms() {
         films.clear();
