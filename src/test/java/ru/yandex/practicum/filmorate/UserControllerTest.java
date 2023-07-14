@@ -30,7 +30,7 @@ public class UserControllerTest {
     @Autowired
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    private final User userWithId = new User(1, "mail@mail.ru", "login",
+    private final User userWithId = new User(1L, "mail@mail.ru", "login",
             "name", LocalDate.of(1994, 1, 18));
     private final User userWithoutId = new User(0, "mail@mail.ru", "login",
             "name", LocalDate.of(1994, 1, 18));

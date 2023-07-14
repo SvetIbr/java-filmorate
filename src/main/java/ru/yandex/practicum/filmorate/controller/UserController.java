@@ -1,17 +1,14 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Класс контроллера для работы с пользователями
@@ -21,10 +18,10 @@ import java.util.Map;
  */
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    private final Map<Integer, User> users = new HashMap<>();
-    private static int numberId = 1;
+    private final UserService service;
 
     /**
      * Метод получения всего списка пользователя из памяти контроллера через запрос
@@ -32,8 +29,8 @@ public class UserController {
      * @return список всех пользователей и код ответа API
      */
     @GetMapping
-    public ResponseEntity<List<User>> findAllUsers() {
-        return new ResponseEntity<>(new ArrayList<>(users.values()), HttpStatus.OK);
+    public List<User> findAll() {
+        return service.findAllUsers();
     }
 
     /**
@@ -45,26 +42,8 @@ public class UserController {
      * @see Class #User
      */
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        try {
-            if (user.getId() > 0) {
-                log.error("Попытка добавить пользователя со своим идентификатором " +
-                        "(при создании генерируется автоматически)");
-                throw new ValidationException("Пользователь не должен иметь идентификатора " +
-                        "(при создании генерируется автоматически)");
-            }
-            validateUser(user);
-            if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
-                user.setName(user.getLogin());
-            }
-            user.setId(numberId);
-            users.put(user.getId(), user);
-            numberId++;
-            log.info("Добавлен пользователь: " + user);
-            return new ResponseEntity<>(user, HttpStatus.CREATED);
-        } catch (ValidationException exp) {
-            return new ResponseEntity<>(user, HttpStatus.BAD_REQUEST);
-        }
+    public User create(@RequestBody User user) {
+        return service.createUser(user);
     }
 
     /**
@@ -75,20 +54,8 @@ public class UserController {
      * @throws ValidationException если объект не прошел валидацию
      */
     @PutMapping
-    public ResponseEntity<User> updateUser(@RequestBody User user) {
-        try {
-            validateUser(user);
-            try {
-                validateForUpdate(user);
-            } catch (ValidationException exp) {
-                return new ResponseEntity<>(user, HttpStatus.NOT_FOUND);
-            }
-            users.put(user.getId(), user);
-            log.info("Обновлен пользователь: " + user);
-            return new ResponseEntity<>(user, HttpStatus.OK);
-        } catch (ValidationException exp) {
-            return new ResponseEntity<>(user, HttpStatus.BAD_REQUEST);
-        }
+    public User update(@RequestBody User user) {
+        return service.updateUser(user);
     }
 
     /**
@@ -97,40 +64,34 @@ public class UserController {
      * @return код ответа API
      */
     @DeleteMapping
-    public ResponseEntity<HttpStatus> deleteAllUsers() {
-        users.clear();
-        numberId = 1;
-        return new ResponseEntity<>(HttpStatus.OK);
+    public HttpStatus deleteAll() {
+        service.deleteAllUsers();
+        return HttpStatus.OK;
     }
 
-    private void validateUser(User user) throws ValidationException {
-        if (user == null) {
-            log.error("Пользователь = Null");
-            throw new ValidationException("Пользователь = null");
-        }
-        if (user.getEmail().isBlank()
-                || user.getEmail().isEmpty()
-                || !user.getEmail().contains("@")) {
-            log.error("Некорректный email пользователя");
-            throw new ValidationException("Email пользователя не может быть пустым " +
-                    "и должен содержать \"@\"");
-        }
-        if (user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
-            log.error("Логин пользователя пустой или содержит пробелы");
-            throw new ValidationException("Логин пользователя не может быть пустым " +
-                    "и не должен содержать пробелы");
-        }
-        LocalDate now = LocalDate.now();
-        if (user.getBirthday().isAfter(now)) {
-            log.error("Дата рождения пользователя в будущем");
-            throw new ValidationException("Дата рождения пользователя не может быть в будущем");
-        }
+    @GetMapping("/{id}")
+    public User findUserById(@PathVariable Long id) {
+        return service.getUserById(id);
     }
 
-    private void validateForUpdate(User user) {
-        if (!users.containsKey(user.getId())) {
-            log.error("Пользователя с таким идентификатором нет");
-            throw new ValidationException("Идентификатор фильма не найден");
-        }
+    @PutMapping("/{id}/friends/{friendId}")
+    public User addToFriends(@PathVariable Long id, Long friendId) {
+        return service.addToFriends(id, friendId);
     }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public User deleteFromFriends(@PathVariable Long id, Long friendId) {
+        return service.deleteFromFriends(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getFriendsByUser(@PathVariable Long id) {
+        return service.getFriendsByUser(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable Long id, Long otherId) {
+        return service.getCommonFriends(id, otherId);
+    }
+
 }

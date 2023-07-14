@@ -2,8 +2,10 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 /**
  * Класс фильма со свойствами <b>id</b>, <b>name</b>, <b>description</b>, <b>releaseDate</b> и <b>duration</b>
@@ -13,11 +15,12 @@ import java.time.LocalDate;
  */
 @Data
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class Film {
     /**
      * Поле идентификатор
      */
-    private int id;
+    private Long id;
     /**
      * Поле наименование
      */
@@ -35,4 +38,8 @@ public class Film {
      */
     private final long duration;
 
+    /**
+     * Поле список лайков
+     */
+    private final Set<Long> likes;
 }
