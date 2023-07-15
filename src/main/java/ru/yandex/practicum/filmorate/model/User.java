@@ -2,9 +2,10 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -16,7 +17,6 @@ import java.util.Set;
  */
 @Data
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class User {
     /**
      * Поле идентификатор
@@ -42,5 +42,5 @@ public class User {
     /**
      * Поле список друзей
      */
-    private final Set<Long> friends;
+    private Set<Long> friends;
 }

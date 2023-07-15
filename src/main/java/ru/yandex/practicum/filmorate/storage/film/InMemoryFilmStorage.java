@@ -5,9 +5,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -18,11 +16,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     private static Long numberId = 1L;
 
     public List<Film> findAllFilms() {
-        return List.of((Film) films.values());
+        return new ArrayList<>(films.values());
     }
 
     public Film createFilm(Film film) {
         film.setId(numberId);
+        film.setLikes(new HashSet<>());
         films.put(film.getId(), film);
         numberId++;
         log.info("Добавлен фильм: " + film);
@@ -31,6 +30,9 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     public Film updateFilm(Film film) {
         checkId(film.getId());
+        if (film.getLikes() == null) {
+            film.setLikes(new HashSet<>());
+        }
         films.put(film.getId(), film);
         log.info("Обновлен фильм: " + film);
         return film;
@@ -49,11 +51,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     public void addLikeToFilm(Long idFilm, Long idUser) {
         checkId(idFilm);
         films.get(idFilm).getLikes().add(idUser);
+        log.info("Фильму " + films.get(idFilm).getName() + " поставили лайк");
     }
 
     public void deleteLikeFromFilm(Long idFilm, Long idUser) {
         checkId(idFilm);
         films.get(idFilm).getLikes().remove(idUser);
+        log.info("У фильма " + films.get(idFilm).getName() + " отменили свой лайк");
     }
 
     public List<Film> getPopularFilm(Integer count) {
@@ -65,8 +69,8 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     private void checkId(Long id) {
         if (!films.containsKey(id)) {
-            log.error("Пользователя с таким идентификатором нет");
-            throw new NotFoundException("Идентификатор пользователя не найден");
+            log.error("Фильма с таким идентификатором нет");
+            throw new NotFoundException("Идентификатор фильма не найден");
         }
     }
 }

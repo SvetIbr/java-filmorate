@@ -16,6 +16,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.HashSet;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -27,12 +28,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class FilmControllerTest {
     @Autowired
     private MockMvc mockMvc;
+    private final Film filmWithId = new Film(1L, "title", "description",
+            LocalDate.of(1994, 1, 18), 180, new HashSet<>());
+    private final Film filmWithoutId = new Film(0L,"title", "description",
+            LocalDate.of(1994, 1, 18), 180, new HashSet<>());
     @Autowired
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-    private final Film filmWithId = new Film(1, "title", "description",
-            LocalDate.of(1994, 1, 18), 180);
-    private final Film filmWithoutId = new Film(0, "title", "description",
-            LocalDate.of(1994, 1, 18), 180);
 
     @AfterEach
     public void afterEach() throws Exception {
@@ -85,8 +86,8 @@ public class FilmControllerTest {
 
     @Test
     public void createFilmWithBlankName() throws Exception {
-        Film film = new Film(0, " ", "description",
-                LocalDate.of(1994, 1, 18), 180);
+        Film film = new Film(0L, " ", "description",
+                LocalDate.of(1994, 1, 18), 180, new HashSet<>());
         var requestBuilder = post("/films")
                 .content(objectMapper.writeValueAsString(film))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -106,8 +107,8 @@ public class FilmControllerTest {
 
     @Test
     public void createFilmWithEmptyName() throws Exception {
-        Film film = new Film(0, "", "description",
-                LocalDate.of(1994, 1, 18), 180);
+        Film film = new Film(0L, "", "description",
+                LocalDate.of(1994, 1, 18), 180, new HashSet<>());
         var requestBuilder = post("/films")
                 .content(objectMapper.writeValueAsString(film))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -127,12 +128,12 @@ public class FilmControllerTest {
 
     @Test
     public void createFilmWithFailDescription() throws Exception {
-        Film film = new Film(0, "name", "description description " +
+        Film film = new Film(0L, "name", "description description " +
                 "description description description description description description " +
                 "description description description description description description " +
                 "description description description description description description " +
                 "description description description", LocalDate.of(1994, 1, 18),
-                180);
+                180, new HashSet<>());
         var requestBuilder = post("/films")
                 .content(objectMapper.writeValueAsString(film))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -152,8 +153,8 @@ public class FilmControllerTest {
 
     @Test
     public void createFilmWithEmptyDescription() throws Exception {
-        Film film = new Film(0, "name", "", LocalDate.of(1994, 1, 18),
-                180);
+        Film film = new Film(0L, "name", "", LocalDate.of(1994, 1, 18),
+                180, new HashSet<>());
         var requestBuilder = post("/films")
                 .content(objectMapper.writeValueAsString(film))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -173,8 +174,8 @@ public class FilmControllerTest {
 
     @Test
     public void createFilmWithFailReleaseDate() throws Exception {
-        Film film = new Film(0, "name", "description",
-                LocalDate.of(1893, 1, 18), 180);
+        Film film = new Film(0L, "name", "description",
+                LocalDate.of(1893, 1, 18), 180,new HashSet<>());
         var requestBuilder = post("/films")
                 .content(objectMapper.writeValueAsString(film))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -194,8 +195,8 @@ public class FilmControllerTest {
 
     @Test
     public void createFilmWithFailDuration() throws Exception {
-        Film film = new Film(0, "name", "description",
-                LocalDate.of(1994, 1, 18), -180);
+        Film film = new Film(0L, "name", "description",
+                LocalDate.of(1994, 1, 18), -180, new HashSet<>());
         var requestBuilder = post("/films")
                 .content(objectMapper.writeValueAsString(film))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -215,8 +216,8 @@ public class FilmControllerTest {
 
     @Test
     public void createFilmWithEmptyDuration() throws Exception {
-        Film film = new Film(0, "name", "description",
-                LocalDate.of(1994, 1, 18), 0);
+        Film film = new Film(0L, "name", "description",
+                LocalDate.of(1994, 1, 18), 0, new HashSet<>());
         var requestBuilder = post("/films")
                 .content(objectMapper.writeValueAsString(film))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -265,8 +266,8 @@ public class FilmControllerTest {
     public void updateFilmWithValidFields() throws Exception {
         createFilm();
 
-        Film updateFilm = new Film(1, "updateTitle", "update description",
-                LocalDate.of(1994, 1, 19), 189);
+        Film updateFilm = new Film(1L, "updateTitle", "update description",
+                LocalDate.of(1994, 1, 19), 189, new HashSet<>());
         var requestBuilder = put("/films")
                 .content(objectMapper.writeValueAsString(updateFilm))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -294,8 +295,8 @@ public class FilmControllerTest {
     public void updateFilmWithFailId() throws Exception {
         createFilm();
 
-        Film updateFilm = new Film(2, "updateTitle", "update description",
-                LocalDate.of(1994, 1, 19), 189);
+        Film updateFilm = new Film(2L, "updateTitle", "update description",
+                LocalDate.of(1994, 1, 19), 189, new HashSet<>());
         var requestBuilder = put("/films")
                 .content(objectMapper.writeValueAsString(updateFilm))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -317,8 +318,8 @@ public class FilmControllerTest {
     public void updateFilmWithFailName() throws Exception {
         createFilm();
 
-        Film updateFilm = new Film(1, "", "update description",
-                LocalDate.of(1994, 1, 19), 189);
+        Film updateFilm = new Film(1L, "", "update description",
+                LocalDate.of(1994, 1, 19), 189, new HashSet<>());
         var requestBuilder = put("/films")
                 .content(objectMapper.writeValueAsString(updateFilm))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -340,8 +341,8 @@ public class FilmControllerTest {
     public void updateFilmWithFailDescriptions() throws Exception {
         createFilm();
 
-        Film updateFilm = new Film(1, "update title", "",
-                LocalDate.of(1994, 1, 19), 189);
+        Film updateFilm = new Film(1L, "update title", "",
+                LocalDate.of(1994, 1, 19), 189, new HashSet<>());
         var requestBuilder = put("/films")
                 .content(objectMapper.writeValueAsString(updateFilm))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -363,8 +364,8 @@ public class FilmControllerTest {
     public void updateFilmWithFailReleaseDate() throws Exception {
         createFilm();
 
-        Film updateFilm = new Film(1, "update title", "update description",
-                LocalDate.of(1888, 1, 19), 189);
+        Film updateFilm = new Film(1L, "update title", "update description",
+                LocalDate.of(1888, 1, 19), 189, new HashSet<>());
         var requestBuilder = put("/films")
                 .content(objectMapper.writeValueAsString(updateFilm))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -386,8 +387,8 @@ public class FilmControllerTest {
     public void updateFilmWithFailDuration() throws Exception {
         createFilm();
 
-        Film updateFilm = new Film(1, "update title", "update description",
-                LocalDate.of(1888, 1, 19), -189);
+        Film updateFilm = new Film(1L, "update title", "update description",
+                LocalDate.of(1888, 1, 19), -189, new HashSet<>());
         var requestBuilder = put("/films")
                 .content(objectMapper.writeValueAsString(updateFilm))
                 .contentType(MediaType.APPLICATION_JSON)

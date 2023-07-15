@@ -6,10 +6,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -18,11 +15,12 @@ public class InMemoryUserStorage implements UserStorage {
     private static Long numberId = 1L;
 
     public List<User> findAllUsers() {
-        return List.of((User) users.values());
+        return new ArrayList<>(users.values());
     }
 
     public User createUser(User user) {
         user.setId(numberId);
+        user.setFriends(new HashSet<>());
         numberId++;
         users.put(user.getId(), user);
         log.info("Добавлен пользователь: " + user);
@@ -31,6 +29,9 @@ public class InMemoryUserStorage implements UserStorage {
 
     public User updateUser(User user) {
         checkId(user.getId());
+        if (user.getFriends() == null) {
+            user.setFriends(new HashSet<>());
+        }
         users.put(user.getId(), user);
         log.info("Обновлен пользователь: " + user);
         return user;
@@ -44,6 +45,7 @@ public class InMemoryUserStorage implements UserStorage {
         checkId(idUser);
         checkId(idFriend);
         users.get(idUser).getFriends().add(idFriend);
+        users.get(idFriend).getFriends().add(idUser);
         log.info("Пользователь " + users.get(idUser).getName()
                 + " добавил в друзья " + users.get(idFriend).getName());
         return users.get(idFriend);
@@ -53,6 +55,7 @@ public class InMemoryUserStorage implements UserStorage {
         checkId(idUser);
         checkId(idFriend);
         users.get(idUser).getFriends().remove(idFriend);
+        users.get(idFriend).getFriends().remove(idUser);
         log.info("Пользователь " + users.get(idUser).getName()
                 + " удалил из друзей " + users.get(idFriend).getName());
         return users.get(idFriend);
@@ -60,16 +63,24 @@ public class InMemoryUserStorage implements UserStorage {
 
     public List<User> getFriendsByUser(Long idUser) {
         checkId(idUser);
-        return List.of((User) users.get(idUser).getFriends());
+        List<User> friends = new ArrayList<>();
+        if (!users.get(idUser).getFriends().isEmpty()) {
+            for (Long cur : users.get(idUser).getFriends()) {
+                friends.add(users.get(cur));
+            }
+        }
+        return friends;
     }
 
     public List<User> getCommonFriends(Long idUser, Long otherId) {
         checkId(idUser);
         checkId(otherId);
         List<User> commonFriends = new ArrayList<>();
-        for (Long cur: users.get(idUser).getFriends()) {
-            if (users.get(idUser).getFriends().contains(cur)) {
-                commonFriends.add(users.get(cur));
+        if (!users.get(idUser).getFriends().isEmpty() || !users.get(otherId).getFriends().isEmpty()) {
+            for (Long cur : users.get(idUser).getFriends()) {
+                if (users.get(otherId).getFriends().contains(cur)) {
+                    commonFriends.add(users.get(cur));
+                }
             }
         }
         return commonFriends;

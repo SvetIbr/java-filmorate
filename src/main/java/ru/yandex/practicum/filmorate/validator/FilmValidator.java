@@ -32,7 +32,7 @@ public class FilmValidator {
             throw new ValidationException("Продолжительность фильма не может быть меньше или равна 0");
         }
         if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(START_OF_ANY_RELEASE_DATE)) {
-            log.error("Дата релиза фильма раньше 28 декабря 1985");
+            log.error("Дата релиза фильма раньше 28 декабря 1895");
             throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1895 года");
         }
     }

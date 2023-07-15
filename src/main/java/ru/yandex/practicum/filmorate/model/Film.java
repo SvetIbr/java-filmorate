@@ -2,9 +2,9 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -15,7 +15,6 @@ import java.util.Set;
  */
 @Data
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class Film {
     /**
      * Поле идентификатор
@@ -41,5 +40,5 @@ public class Film {
     /**
      * Поле список лайков
      */
-    private final Set<Long> likes;
+    private Set<Long> likes;
 }
