@@ -1,5 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
+import org.springframework.stereotype.Component;
+
+//@Component
 public class ErrorResponse {
     private final String error;
 

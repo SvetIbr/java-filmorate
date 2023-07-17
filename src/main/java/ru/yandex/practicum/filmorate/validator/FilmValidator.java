@@ -21,11 +21,14 @@ public class FilmValidator {
             log.error("Название фильма пустое");
             throw new ValidationException("Название фильма не может быть пустым");
         }
-        if (film.getDescription() == null
-                || film.getDescription().length() > 200
-                || film.getDescription().isEmpty()) {
+        if (film.getDescription().length() > 200) {
             log.error("Описание фильма больше 200 символов");
             throw new ValidationException("Длина описания фильма не может быть более 200 символов");
+        }
+        if (film.getDescription() == null
+                || film.getDescription().isEmpty()) {
+            log.error("Описание фильма пустое");
+            throw new ValidationException("Добавьте описание фильма");
         }
         if (film.getDuration() <= 0) {
             log.error("Продолжительность фильма меньше или равна 0");

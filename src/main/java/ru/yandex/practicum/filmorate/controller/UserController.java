@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -42,8 +43,8 @@ public class UserController {
      * @see Class #User
      */
     @PostMapping
-    public User create(@RequestBody User user) {
-        return service.createUser(user);
+    public ResponseEntity<User> create(@RequestBody User user) {
+        return new ResponseEntity<>(service.createUser(user), HttpStatus.CREATED);
     }
 
     /**

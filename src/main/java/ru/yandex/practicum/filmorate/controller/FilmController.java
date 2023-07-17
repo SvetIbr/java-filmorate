@@ -1,8 +1,9 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -19,10 +20,16 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/films")
 public class FilmController {
+
     private final FilmService service;
+
+    @Autowired
+    public FilmController(FilmService service) {
+        this.service = service;
+    }
+
 
     /**
      * Метод получения всего списка фильмов из памяти контроллера через запрос
@@ -42,8 +49,8 @@ public class FilmController {
      * @throws ValidationException если объект не прошел валидацию
      */
     @PostMapping
-    public Film create(@RequestBody Film film) {
-        return service.createFilm(film);
+    public ResponseEntity<Film> create(@RequestBody Film film) {
+        return new ResponseEntity<>(service.createFilm(film), HttpStatus.CREATED);
     }
 
     /**
