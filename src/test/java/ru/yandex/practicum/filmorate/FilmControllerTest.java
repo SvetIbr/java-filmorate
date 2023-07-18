@@ -83,9 +83,9 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Фильм не должен иметь идентификатора (при создании генерируется автоматически)")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Фильм не должен иметь идентификатора " +
+                        "(при создании генерируется автоматически)")));
 
         getListFilmsMustBeEmpty();
     }
@@ -105,9 +105,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Название фильма не может быть пустым")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Название фильма не может быть пустым")));
 
         getListFilmsMustBeEmpty();
     }
@@ -127,9 +126,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Название фильма не может быть пустым")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Название фильма не может быть пустым")));
 
         getListFilmsMustBeEmpty();
     }
@@ -153,9 +151,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Длина описания фильма не может быть более 200 символов")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Длина описания фильма не может быть более 200 символов")));
 
         getListFilmsMustBeEmpty();
     }
@@ -175,9 +172,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Добавьте описание фильма")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Добавьте описание фильма")));
 
         getListFilmsMustBeEmpty();
     }
@@ -197,9 +193,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Дата релиза не может быть раньше 28 декабря 1895 года")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Дата релиза не может быть раньше 28 декабря 1895 года")));
 
         getListFilmsMustBeEmpty();
     }
@@ -219,9 +214,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Продолжительность фильма не может быть меньше или равна 0")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Продолжительность фильма не может быть меньше или равна 0")));
 
         getListFilmsMustBeEmpty();
     }
@@ -241,9 +235,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Продолжительность фильма не может быть меньше или равна 0")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Продолжительность фильма не может быть меньше или равна 0")));
 
         getListFilmsMustBeEmpty();
     }
@@ -260,9 +253,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Произошла непредвиденная ошибка.")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Произошла непредвиденная ошибка.")));
 
         getListFilmsMustBeEmpty();
     }
@@ -281,9 +273,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Произошла непредвиденная ошибка.")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Произошла непредвиденная ошибка.")));
 
         getListFilmsMustBeEmpty();
     }
@@ -334,9 +325,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Идентификатор фильма не найден")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Идентификатор фильма не найден")));
 
         getListFilmsMustHaveNotUpdateFilm();
     }
@@ -358,9 +348,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Название фильма не может быть пустым")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Название фильма не может быть пустым")));
 
         getListFilmsMustHaveNotUpdateFilm();
     }
@@ -382,9 +371,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Добавьте описание фильма")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Добавьте описание фильма")));
 
         getListFilmsMustHaveNotUpdateFilm();
     }
@@ -406,9 +394,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Дата релиза не может быть раньше 28 декабря 1895 года")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Дата релиза не может быть раньше 28 декабря 1895 года")));
 
         getListFilmsMustHaveNotUpdateFilm();
     }
@@ -430,9 +417,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Продолжительность фильма не может быть меньше или равна 0")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Продолжительность фильма не может быть меньше или равна 0")));
 
         getListFilmsMustHaveNotUpdateFilm();
     }
@@ -556,9 +542,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Идентификатор фильма не найден")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Идентификатор фильма не найден")));
 
     }
 
@@ -586,9 +571,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Идентификатор пользователя не найден")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
 
     }
 
@@ -622,9 +606,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Идентификатор фильма не найден")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Идентификатор фильма не найден")));
 
         var checkListFilmsRequest1 = get("/films")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -670,9 +653,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Идентификатор пользователя не найден")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
 
         var checkListFilmsRequest1 = get("/films")
                 .contentType(MediaType.APPLICATION_JSON)

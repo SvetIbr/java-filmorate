@@ -814,7 +814,6 @@ public class UserControllerTest {
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk());
 
-
         var requestBuilderForDelete = delete("/users/1/friends/3")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);
