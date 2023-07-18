@@ -36,12 +36,13 @@ public class InMemoryUserStorage implements UserStorage {
         log.info("Обновлен пользователь: " + user);
         return user;
     }
+
     public void deleteAllUsers() {
         users.clear();
         numberId = 1L;
     }
 
-    public User addToFriends (Long idUser, Long idFriend) {
+    public User addToFriends(Long idUser, Long idFriend) {
         checkId(idUser);
         checkId(idFriend);
         users.get(idUser).getFriends().add(idFriend);
