@@ -2,19 +2,17 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Класс фильма со свойствами <b>id</b>, <b>name</b>, <b>description</b>, <b>releaseDate</b> и <b>duration</b>
+ * Класс фильма со свойствами <b>id</b>, <b>name</b>, <b>description</b>,
+ * <b>releaseDate</b>, <b>duration</b> и <b>likes</b>
  *
  * @version 1.0
  * @autor Светлана Ибраева
  */
-//@Component
 @Data
 @AllArgsConstructor
 public class Film {
@@ -38,7 +36,6 @@ public class Film {
      * Поле продолжительность
      */
     private final long duration;
-
     /**
      * Поле список лайков
      */

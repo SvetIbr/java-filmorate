@@ -1,11 +1,10 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -13,26 +12,24 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import java.util.List;
 
 /**
- * Класс контроллера для работы с фильмами
+ * Класс контроллера для работы с запросами к сервису фильмов
  *
  * @author Светлана Ибраева
  * @version 1.0
  */
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/films")
 public class FilmController {
 
+    /**
+     * Поле сервис для работы с хранилищем фильмов
+     */
     private final FilmService service;
 
-    @Autowired
-    public FilmController(FilmService service) {
-        this.service = service;
-    }
-
-
     /**
-     * Метод получения всего списка фильмов из памяти контроллера через запрос
+     * Метод получения всего списка фильмов через запрос
      *
      * @return список всех фильмов
      */
@@ -42,11 +39,10 @@ public class FilmController {
     }
 
     /**
-     * Метод добавления объекта film в память контроллера через запрос
+     * Метод добавления фильма в хранилище сервиса через запрос
      *
-     * @param film фильм
-     * @return копию объекта фильм с добавленным id
-     * @throws ValidationException если объект не прошел валидацию
+     * @param film {@link Film}
+     * @return копию объекта film с добавленным id код ответа API 201
      */
     @PostMapping
     public ResponseEntity<Film> create(@RequestBody Film film) {
@@ -54,11 +50,10 @@ public class FilmController {
     }
 
     /**
-     * Метод обновления объекта film через запрос
+     * Метод обновления фильма в хранилище сервиса через запрос
      *
-     * @param film фильм
-     * @return копию объекта film с обновленными полями и код ответа API
-     * @throws ValidationException если объект не прошел валидацию
+     * @param film {@link Film}
+     * @return копию объекта film с обновленными полями
      */
     @PutMapping
     public Film update(@RequestBody Film film) {
@@ -66,7 +61,7 @@ public class FilmController {
     }
 
     /**
-     * Метод очищения списка всех фильмов в  памяти контроллера через запрос
+     * Метод очищения списка всех фильмов в хранилище сервиса через запрос
      *
      * @return код ответа API
      */
@@ -76,21 +71,46 @@ public class FilmController {
         return (HttpStatus.OK);
     }
 
+    /**
+     * Метод получения фильма по идентификатору из хранилища сервиса через запрос
+     *
+     * @param id идентификатор
+     * @return копию объекта film с указанным идентификатором
+     */
     @GetMapping("/{id}")
     public Film findFilmById(@PathVariable Long id) {
         return service.getFilmById(id);
     }
 
+    /**
+     * Метод добавления лайка фильму через запрос
+     *
+     * @param id,userId идентификатор фильма, идентификатор пользователя user,
+     *                  который ставит лайк {@link ru.yandex.practicum.filmorate.model.User}
+     */
     @PutMapping("/{id}/like/{userId}")
     public void addLikeToFilm(@PathVariable Long id, @PathVariable Long userId) {
         service.addLikeToFilm(id, userId);
     }
 
+    /**
+     * Метод удаления добавленного лайка фильму через запрос
+     *
+     * @param id,userId идентификатор фильма, идентификатор пользователя user,
+     *                  который удаляет свой лайк {@link ru.yandex.practicum.filmorate.model.User}
+     */
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLikeFromFilm(@PathVariable Long id, @PathVariable Long userId) {
         service.deleteLikeFromFilm(id, userId);
     }
 
+    /**
+     * Метод получения списка самых популярных фильмов из хранилища сервиса через запрос
+     *
+     * @param count количество первых по популярности фильмов в списке,
+     *              если count не указано в запросе, по умолчанию count становится 10
+     * @return список фильмов, сформированных по количеству лайков
+     */
     @GetMapping(value = {"/popular?count={count}", "/popular"})
     public List<Film> getPopularFilm(@RequestParam(required = false) Integer count) {
         if (count == null) {
@@ -98,5 +118,4 @@ public class FilmController {
         }
         return service.getPopularFilm(count);
     }
-
 }

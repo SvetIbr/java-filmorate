@@ -7,13 +7,30 @@ import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
 
+/**
+ * Класс валидатора для проверки объектов film
+ *
+ * @author Светлана Ибраева
+ * @version 1.0
+ */
 @Slf4j
 @Component
 public class FilmValidator {
+    /**
+     * Поле отсчет даты релиза
+     */
     private static final LocalDate START_OF_ANY_RELEASE_DATE = LocalDate.of(1895, 12, 28);
+
+    /**
+     * Метод проверки фильма на отсутствие необходимых заполненных полей и соответствие требованиям даты релиза
+     *
+     * @param film {@link Film}
+     * @throws ValidationException с сообщением о причине возникновения исключения,
+     *                             если проверяемый объект не соответствует
+     */
     public void validate(Film film) {
         if (film == null) {
-            throw new ValidationException("Фильм = null");
+            throw new ValidationException("Данные для заполнения фильма отсутствуют");
         }
         if (film.getName().isEmpty()
                 || film.getName().isBlank()
@@ -25,8 +42,7 @@ public class FilmValidator {
             log.error("Описание фильма больше 200 символов");
             throw new ValidationException("Длина описания фильма не может быть более 200 символов");
         }
-        if (film.getDescription() == null
-                || film.getDescription().isEmpty()) {
+        if (film.getDescription().isEmpty()) {
             log.error("Описание фильма пустое");
             throw new ValidationException("Добавьте описание фильма");
         }

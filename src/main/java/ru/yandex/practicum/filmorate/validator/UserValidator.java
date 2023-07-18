@@ -7,13 +7,27 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 
+/**
+ * Класс валидатора для проверки объектов user
+ *
+ * @author Светлана Ибраева
+ * @version 1.0
+ */
 @Slf4j
 @Component
 public class UserValidator {
+
+    /**
+     * Метод проверки пользователя на отсутствие или некорректное заполнение необходимых полей
+     *
+     * @param user {@link User}
+     * @throws ValidationException с сообщением о причине возникновения исключения,
+     *                             если проверяемый объект не соответствует
+     */
     public void validate(User user) throws ValidationException {
         if (user == null) {
-            log.error("Пользователь = Null");
-            throw new ValidationException("Пользователь = null");
+            log.error("Пользователь = null");
+            throw new ValidationException("Данные для создания пользователя отсутствуют");
         }
         if (user.getEmail().isBlank()
                 || user.getEmail().isEmpty()

@@ -5,14 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
 
 /**
- * Класс контроллера для работы с пользователями
+ * Класс контроллера для работы с запросами к сервису пользователей
  *
  * @author Светлана Ибраева
  * @version 1.0
@@ -22,12 +21,15 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
+    /**
+     * Поле сервис для работы с хранилищем пользователей
+     */
     private final UserService service;
 
     /**
-     * Метод получения всего списка пользователя из памяти контроллера через запрос
+     * Метод получения всего списка пользователей из хранилища через запрос
      *
-     * @return список всех пользователей и код ответа API
+     * @return список всех пользователей
      */
     @GetMapping
     public List<User> findAll() {
@@ -35,12 +37,10 @@ public class UserController {
     }
 
     /**
-     * Метод добавления объекта user в память контроллера через запрос
+     * Метод добавления пользователя в хранилище сервиса через запрос
      *
-     * @param user пользователь
-     * @return копию объекта user с добавленным id и код ответа API
-     * @throws ValidationException если объект не прошел валидацию
-     * @see Class #User
+     * @param user {@link User}
+     * @return копию объекта user с добавленным id код ответа API 201
      */
     @PostMapping
     public ResponseEntity<User> create(@RequestBody User user) {
@@ -48,11 +48,10 @@ public class UserController {
     }
 
     /**
-     * Метод обновления объекта user через запрос
+     * Метод обновления пользователя в хранилище сервиса через запрос
      *
-     * @param user пользователь
-     * @return копию объекта user с обновленными полями и код ответа API
-     * @throws ValidationException если объект не прошел валидацию
+     * @param user {@link User}
+     * @return копию объекта user с обновленными полями
      */
     @PutMapping
     public User update(@RequestBody User user) {
@@ -60,7 +59,7 @@ public class UserController {
     }
 
     /**
-     * Метод очищения списка всех пользователей в  памяти контроллера через запрос
+     * Метод очищения списка всех пользователей в хранилище сервиса через запрос
      *
      * @return код ответа API
      */
@@ -70,26 +69,58 @@ public class UserController {
         return HttpStatus.OK;
     }
 
+    /**
+     * Метод получения пользователя по идентификатору из хранилища сервиса через запрос
+     *
+     * @param id идентификатор
+     * @return копию объекта user с указанным идентификатором
+     */
     @GetMapping("/{id}")
     public User findUserById(@PathVariable Long id) {
         return service.getUserById(id);
     }
 
+    /**
+     * Метод добавления пользователей в список друзей друг друга через запрос
+     *
+     * @param id,friendId идентификатор пользователя, который отправляет запрос на добавление,
+     *                    идентификатор пользователя, которого добавляют в друзья
+     * @return копию объекта user, которого добавили в друзья
+     */
     @PutMapping("/{id}/friends/{friendId}")
     public User addToFriends(@PathVariable Long id, @PathVariable Long friendId) {
         return service.addToFriends(id, friendId);
     }
 
+    /**
+     * Метод удаления пользователя из списка друзей друг друга через запрос
+     *
+     * @param id,friendId идентификатор пользователя, который отправляет запрос на удаление,
+     *                    идентификатор пользователя, которого удаляют из друзей
+     * @return копию объекта user, которого удалили из друзей
+     */
     @DeleteMapping("/{id}/friends/{friendId}")
     public User deleteFromFriends(@PathVariable Long id, @PathVariable Long friendId) {
         return service.deleteFromFriends(id, friendId);
     }
 
+    /**
+     * Метод получения списка друзей пользователя по идентификатору из хранилища сервиса  через запрос
+     *
+     * @param id идентификатор пользователя, чей список друзей запрашивается
+     * @return список друзей пользователя
+     */
     @GetMapping("/{id}/friends")
     public List<User> getFriendsByUser(@PathVariable Long id) {
         return service.getFriendsByUser(id);
     }
 
+    /**
+     * Метод получения списка общих друзей двух пользователей из хранилища сервиса  через запрос
+     *
+     * @param id,otherId идентификаторы пользователей
+     * @return список общих друзей двух пользователей
+     */
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
         return service.getCommonFriends(id, otherId);
