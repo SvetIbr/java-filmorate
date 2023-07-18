@@ -33,7 +33,6 @@ public class UserControllerTest {
     @Autowired
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-
     private final User userWithId = new User(1L, "mail@mail.ru", "login",
             "name", LocalDate.of(1994, 1, 18), new HashSet<>());
     private final User userWithoutId = new User(0L, "mail@mail.ru", "login",
@@ -66,7 +65,8 @@ public class UserControllerTest {
 
         mockMvc.perform(checkListUsersRequest)
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(Collections.singletonList(userWithId))));
+                .andExpect(content().json(objectMapper
+                        .writeValueAsString(Collections.singletonList(userWithId))));
     }
 
     @Test
@@ -83,9 +83,8 @@ public class UserControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Произошла непредвиденная ошибка.")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Произошла непредвиденная ошибка.")));
 
         getListUsersMustBeEmpty();
     }
@@ -102,9 +101,8 @@ public class UserControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Произошла непредвиденная ошибка.")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Произошла непредвиденная ошибка.")));
 
         getListUsersMustBeEmpty();
     }
@@ -122,9 +120,9 @@ public class UserControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Пользователь не должен иметь идентификатора (при создании генерируется автоматически)")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Пользователь не должен иметь идентификатора " +
+                        "(при создании генерируется автоматически)")));
 
         getListUsersMustBeEmpty();
     }
@@ -173,9 +171,9 @@ public class UserControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Email пользователя не может быть пустым и должен содержать \"@\"")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Email пользователя " +
+                        "не может быть пустым и должен содержать \"@\"")));
 
         getListUsersMustBeEmpty();
     }
@@ -195,9 +193,9 @@ public class UserControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Email пользователя не может быть пустым и должен содержать \"@\"")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Email пользователя " +
+                        "не может быть пустым и должен содержать \"@\"")));
 
         getListUsersMustBeEmpty();
     }
@@ -217,9 +215,9 @@ public class UserControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Логин пользователя не может быть пустым и не должен содержать пробелы")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Логин пользователя " +
+                        "не может быть пустым и не должен содержать пробелы")));
 
         getListUsersMustBeEmpty();
     }
@@ -239,9 +237,9 @@ public class UserControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Логин пользователя не может быть пустым и не должен содержать пробелы")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Логин пользователя " +
+                        "не может быть пустым и не должен содержать пробелы")));
 
         getListUsersMustBeEmpty();
     }
@@ -261,9 +259,8 @@ public class UserControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Дата рождения пользователя не может быть в будущем")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Дата рождения пользователя не может быть в будущем")));
 
         getListUsersMustBeEmpty();
     }
@@ -314,9 +311,8 @@ public class UserControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Идентификатор пользователя не найден")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
 
         getListUsersMustHaveNotUpdateUser();
     }
@@ -338,9 +334,9 @@ public class UserControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Email пользователя не может быть пустым и должен содержать \"@\"")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Email пользователя " +
+                        "не может быть пустым и должен содержать \"@\"")));
 
         getListUsersMustHaveNotUpdateUser();
     }
@@ -362,9 +358,9 @@ public class UserControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Email пользователя не может быть пустым и должен содержать \"@\"")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Email пользователя " +
+                        "не может быть пустым и должен содержать \"@\"")));
 
         getListUsersMustHaveNotUpdateUser();
     }
@@ -386,9 +382,9 @@ public class UserControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Логин пользователя не может быть пустым и не должен содержать пробелы")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Логин пользователя " +
+                        "не может быть пустым и не должен содержать пробелы")));
 
         getListUsersMustHaveNotUpdateUser();
     }
@@ -410,9 +406,8 @@ public class UserControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Дата рождения пользователя не может быть в будущем")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Дата рождения пользователя не может быть в будущем")));
 
         getListUsersMustHaveNotUpdateUser();
     }
@@ -449,9 +444,8 @@ public class UserControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Идентификатор пользователя не найден")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
 
         var checkListFilmsRequest = get("/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -573,9 +567,8 @@ public class UserControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Идентификатор пользователя не найден")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
     }
 
     @Test
@@ -603,9 +596,8 @@ public class UserControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Идентификатор пользователя не найден")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
     }
 
     @Test
@@ -726,9 +718,8 @@ public class UserControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Идентификатор пользователя не найден")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
 
         var requestBuilderForCheckFriend = get("/users/1")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -824,9 +815,8 @@ public class UserControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Идентификатор пользователя не найден")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
 
         var requestBuilderForCheckFriend = get("/users/1")
                 .contentType(MediaType.APPLICATION_JSON)
