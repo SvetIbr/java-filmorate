@@ -455,9 +455,8 @@ public class FilmControllerTest {
 
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(new ErrorResponse
-                        ("Идентификатор фильма не найден")));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(new ErrorResponse("Идентификатор фильма не найден")));
 
         var checkListFilmsRequest = get("/films")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -741,8 +740,8 @@ public class FilmControllerTest {
 
         mockMvc.perform(requestBuilderForGetPopularFilms)
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString
-                        (List.of(filmWithTwoLike, filmWithOneLike, filmWithId))));
+                .andExpect(content().json(objectMapper
+                        .writeValueAsString(List.of(filmWithTwoLike, filmWithOneLike, filmWithId))));
 
     }
 
@@ -778,8 +777,9 @@ public class FilmControllerTest {
 
         mockMvc.perform(requestBuilderForGetPopularFilms)
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString
-                        (List.of(filmWithId, film1, film2, film3, film4, film5, film6, film7, film8, film9))));
+                .andExpect(content().json(objectMapper
+                        .writeValueAsString(List.of(filmWithId, film1, film2, film3, film4,
+                                film5, film6, film7, film8, film9))));
 
     }
 
@@ -795,8 +795,7 @@ public class FilmControllerTest {
 
         mockMvc.perform(requestBuilderForGetPopularFilms)
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString
-                        (List.of(filmWithId))));
+                .andExpect(content().json(objectMapper.writeValueAsString(List.of(filmWithId))));
     }
 
     private void getListFilmsMustBeEmpty() throws Exception {
