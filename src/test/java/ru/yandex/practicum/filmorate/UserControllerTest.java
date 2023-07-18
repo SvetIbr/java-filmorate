@@ -33,10 +33,10 @@ public class UserControllerTest {
     @Autowired
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    private final User userWithId = new User(1L, "mail@mail.ru", "login",
-            "name", LocalDate.of(1994, 1, 18), new HashSet<>());
-    private final User userWithoutId = new User(0L, "mail@mail.ru", "login",
-            "name", LocalDate.of(1994, 1, 18), new HashSet<>());
+    private final User userWithId = new User(1L, "mail@mail.ru", "login", "name",
+            LocalDate.of(1994, 1, 18), new HashSet<>());
+    private final User userWithoutId = new User(0L, "mail@mail.ru", "login", "name",
+            LocalDate.of(1994, 1, 18), new HashSet<>());
 
     @AfterEach
     public void afterEach() throws Exception {
@@ -54,7 +54,9 @@ public class UserControllerTest {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString();
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString();
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
                 objectMapper.writeValueAsString(userWithId));
@@ -81,7 +83,9 @@ public class UserControllerTest {
                 .andExpect(status().isInternalServerError())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Произошла непредвиденная ошибка.")));
@@ -99,7 +103,9 @@ public class UserControllerTest {
                 .andExpect(status().isInternalServerError())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Произошла непредвиденная ошибка.")));
@@ -118,7 +124,9 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Пользователь не должен иметь идентификатора " +
@@ -140,9 +148,12 @@ public class UserControllerTest {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        User user1 = new User(1L, "mail@mail.ru", "login",
-                "login", LocalDate.of(1994, 1, 18), new HashSet<>());
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        User user1 = new User(1L, "mail@mail.ru", "login", "login",
+                LocalDate.of(1994, 1, 18), new HashSet<>());
+
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
                 objectMapper.writeValueAsString(user1));
@@ -153,13 +164,14 @@ public class UserControllerTest {
 
         mockMvc.perform(checkListUsersRequest)
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(Collections.singletonList(user1))));
+                .andExpect(content().json(objectMapper
+                        .writeValueAsString(Collections.singletonList(user1))));
     }
 
     @Test
     public void createUserWithFailEmail() throws Exception {
-        User user = new User(0L, "mail.ru", "login",
-                "name", LocalDate.of(1994, 1, 18), new HashSet<>());
+        User user = new User(0L, "mail.ru", "login", "name",
+                LocalDate.of(1994, 1, 18), new HashSet<>());
         var requestBuilder = post("/users")
                 .content(objectMapper.writeValueAsString(user))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -169,7 +181,9 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Email пользователя " +
@@ -180,8 +194,8 @@ public class UserControllerTest {
 
     @Test
     public void createUserWithEmptyEmail() throws Exception {
-        User user = new User(0L, "", "login",
-                "name", LocalDate.of(1994, 1, 18), new HashSet<>());
+        User user = new User(0L, "", "login", "name",
+                LocalDate.of(1994, 1, 18), new HashSet<>());
         var requestBuilder = post("/users")
                 .content(objectMapper.writeValueAsString(user))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -191,7 +205,9 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Email пользователя " +
@@ -202,8 +218,8 @@ public class UserControllerTest {
 
     @Test
     public void createUserWithFailLogin() throws Exception {
-        User user = new User(0L, "mail@mail.ru", "login log",
-                "name", LocalDate.of(1994, 1, 18), new HashSet<>());
+        User user = new User(0L, "mail@mail.ru", "login log", "name",
+                LocalDate.of(1994, 1, 18), new HashSet<>());
         var requestBuilder = post("/users")
                 .content(objectMapper.writeValueAsString(user))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -213,7 +229,9 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Логин пользователя " +
@@ -224,8 +242,8 @@ public class UserControllerTest {
 
     @Test
     public void createUserWithEmptyLogin() throws Exception {
-        User user = new User(0L, "mail@mail.ru", " ",
-                "name", LocalDate.of(1994, 1, 18), new HashSet<>());
+        User user = new User(0L, "mail@mail.ru", " ", "name",
+                LocalDate.of(1994, 1, 18), new HashSet<>());
         var requestBuilder = post("/users")
                 .content(objectMapper.writeValueAsString(user))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -235,7 +253,9 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Логин пользователя " +
@@ -246,8 +266,8 @@ public class UserControllerTest {
 
     @Test
     public void createUserWithFailBirthday() throws Exception {
-        User user = new User(0L, "mail@mail.ru", "login",
-                "name", LocalDate.of(2024, 1, 18), new HashSet<>());
+        User user = new User(0L, "mail@mail.ru", "login", "name",
+                LocalDate.of(2024, 1, 18), new HashSet<>());
         var requestBuilder = post("/users")
                 .content(objectMapper.writeValueAsString(user))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -257,10 +277,13 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Дата рождения пользователя не может быть в будущем")));
+                .writeValueAsString(new ErrorResponse("Дата рождения пользователя " +
+                        "не может быть в будущем")));
 
         getListUsersMustBeEmpty();
     }
@@ -269,8 +292,8 @@ public class UserControllerTest {
     public void updateUserWithValidFields() throws Exception {
         createUser();
 
-        User updateUser = new User(1L, "mail1@mail.ru", "updateLogin",
-                "update name", LocalDate.of(1994, 1, 19), new HashSet<>());
+        User updateUser = new User(1L, "mail1@mail.ru", "updateLogin", "update name",
+                LocalDate.of(1994, 1, 19), new HashSet<>());
         var requestBuilder = put("/users")
                 .content(objectMapper.writeValueAsString(updateUser))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -280,7 +303,9 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString();
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString();
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
                 objectMapper.writeValueAsString(updateUser));
@@ -291,15 +316,16 @@ public class UserControllerTest {
 
         mockMvc.perform(checkListUsersRequest)
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(Collections.singletonList(updateUser))));
+                .andExpect(content().json(objectMapper
+                        .writeValueAsString(Collections.singletonList(updateUser))));
     }
 
     @Test
     public void updateUserWithFailId() throws Exception {
         createUser();
 
-        User updateUser = new User(2L, "mail1@mail.ru", "updateLogin",
-                "update name", LocalDate.of(1994, 1, 19), new HashSet<>());
+        User updateUser = new User(2L, "mail1@mail.ru", "updateLogin", "update name",
+                LocalDate.of(1994, 1, 19), new HashSet<>());
         var requestBuilder = put("/users")
                 .content(objectMapper.writeValueAsString(updateUser))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -309,7 +335,9 @@ public class UserControllerTest {
                 .andExpect(status().isNotFound())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
@@ -321,8 +349,8 @@ public class UserControllerTest {
     public void updateUserWithEmptyEmail() throws Exception {
         createUser();
 
-        User updateUser = new User(1L, "", "updateLogin",
-                "update name", LocalDate.of(1994, 1, 19),new HashSet<>());
+        User updateUser = new User(1L, "", "updateLogin", "update name",
+                LocalDate.of(1994, 1, 19), new HashSet<>());
         var requestBuilder = put("/users")
                 .content(objectMapper.writeValueAsString(updateUser))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -332,7 +360,9 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Email пользователя " +
@@ -345,8 +375,8 @@ public class UserControllerTest {
     public void updateUserWithFailEmail() throws Exception {
         createUser();
 
-        User updateUser = new User(1L, "mail", "updateLogin",
-                "update name", LocalDate.of(1994, 1, 19), new HashSet<>());
+        User updateUser = new User(1L, "mail", "updateLogin", "update name",
+                LocalDate.of(1994, 1, 19), new HashSet<>());
         var requestBuilder = put("/users")
                 .content(objectMapper.writeValueAsString(updateUser))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -356,7 +386,9 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Email пользователя " +
@@ -369,8 +401,8 @@ public class UserControllerTest {
     public void updateUserWithFailLogin() throws Exception {
         createUser();
 
-        User updateUser = new User(1L, "mail@mail.ru", "update login",
-                "update name", LocalDate.of(1994, 1, 19), new HashSet<>());
+        User updateUser = new User(1L, "mail@mail.ru", "update login", "update name",
+                LocalDate.of(1994, 1, 19), new HashSet<>());
         var requestBuilder = put("/users")
                 .content(objectMapper.writeValueAsString(updateUser))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -380,7 +412,9 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Логин пользователя " +
@@ -393,8 +427,8 @@ public class UserControllerTest {
     public void updateUserWithFailBirthday() throws Exception {
         createUser();
 
-        User updateUser = new User(1L, "mail@mail.ru", "updateLogin",
-                "update name", LocalDate.of(2023, 12, 19), new HashSet<>());
+        User updateUser = new User(1L, "mail@mail.ru", "updateLogin", "update name",
+                LocalDate.of(2023, 12, 19), new HashSet<>());
         var requestBuilder = put("/users")
                 .content(objectMapper.writeValueAsString(updateUser))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -404,7 +438,9 @@ public class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Дата рождения пользователя не может быть в будущем")));
@@ -424,10 +460,12 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(userWithId));
+        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
+                .writeValueAsString(userWithId));
     }
 
     @Test
@@ -442,7 +480,9 @@ public class UserControllerTest {
                 .andExpect(status().isNotFound())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
@@ -453,7 +493,8 @@ public class UserControllerTest {
 
         mockMvc.perform(checkListFilmsRequest)
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(Collections.singletonList(userWithId))));
+                .andExpect(content().json(objectMapper
+                        .writeValueAsString(Collections.singletonList(userWithId))));
     }
 
     @Test
@@ -575,8 +616,8 @@ public class UserControllerTest {
     public void addToFriendWithFailIdFriend() throws Exception {
         createUser();
 
-        User friend = new User(0L, "mail@mail.ru", "login",
-                "name", LocalDate.of(1994, 1, 18), new HashSet<>());
+        User friend = new User(0L, "mail@mail.ru", "login", "name",
+                LocalDate.of(1994, 1, 18), new HashSet<>());
 
         var requestBuilderForCreateFriend = post("/users")
                 .content(objectMapper.writeValueAsString(friend))
@@ -604,8 +645,8 @@ public class UserControllerTest {
     public void deleteFromFriendAndGetFriendsWithValidId() throws Exception {
         createUser();
 
-        User friend = new User(0L, "mail@mail.ru", "login",
-                "name", LocalDate.of(1994, 1, 18), new HashSet<>());
+        User friend = new User(0L, "mail@mail.ru", "login", "name",
+                LocalDate.of(1994, 1, 18), new HashSet<>());
 
         var requestBuilderForCreateFriend = post("/users")
                 .content(objectMapper.writeValueAsString(friend))
@@ -716,7 +757,9 @@ public class UserControllerTest {
                 .andExpect(status().isNotFound())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
@@ -729,7 +772,9 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String actualResponseBody1 = mvcResult1.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody1 = mvcResult1
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         Set<Long> friends = new HashSet<>();
         friends.add(2L);
@@ -747,7 +792,9 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String actualResponseBody2 = mvcResult2.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody2 = mvcResult2
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         Set<Long> friends1 = new HashSet<>();
         friends1.add(1L);
@@ -765,7 +812,9 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String actualResponseBody3 = mvcResult3.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody3 = mvcResult3
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody3).isEqualToIgnoringWhitespace(
                 objectMapper.writeValueAsString(Collections.singletonList(friendWithIdAndUser)));
@@ -778,7 +827,9 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String actualResponseBody4 = mvcResult4.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody4 = mvcResult4
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody4).isEqualToIgnoringWhitespace(
                 objectMapper.writeValueAsString(Collections.singletonList(userWithIdAndFriend)));
@@ -813,7 +864,9 @@ public class UserControllerTest {
                 .andExpect(status().isNotFound())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
@@ -826,7 +879,10 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String actualResponseBody1 = mvcResult1.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody1 = mvcResult1
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
+
         Set<Long> friends = new HashSet<>();
         friends.add(2L);
         User userWithIdAndFriend = new User(1L, "mail@mail.ru", "login",
@@ -861,7 +917,9 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String actualResponseBody3 = mvcResult3.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody3 = mvcResult3
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody3).isEqualToIgnoringWhitespace(
                 objectMapper.writeValueAsString(Collections.singletonList(friendWithUser)));
@@ -874,7 +932,9 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String actualResponseBody4 = mvcResult4.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody4 = mvcResult4
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody4).isEqualToIgnoringWhitespace(
                 objectMapper.writeValueAsString(Collections.singletonList(userWithIdAndFriend)));
