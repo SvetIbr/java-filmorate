@@ -69,8 +69,8 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     private void checkId(Long id) {
         if (!films.containsKey(id)) {
-            log.error("Фильма с таким идентификатором нет");
-            throw new NotFoundException("Идентификатор фильма не найден");
+            log.error(String.format("Фильма с идентификатором %d нет", id));
+            throw new NotFoundException(String.format("Фильма с идентификатором %d нет", id));
         }
     }
 }

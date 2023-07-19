@@ -94,8 +94,8 @@ public class InMemoryUserStorage implements UserStorage {
 
     private void checkId(Long id) {
         if (!users.containsKey(id)) {
-            log.error("Пользователя с таким идентификатором нет");
-            throw new NotFoundException("Идентификатор пользователя не найден");
+            log.error(String.format("Пользователя с идентификатором %d нет", id));
+            throw new NotFoundException(String.format("Пользователя с идентификатором %d нет", id));
         }
     }
 }
