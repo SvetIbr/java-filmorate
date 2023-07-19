@@ -326,7 +326,7 @@ public class FilmControllerTest {
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Идентификатор фильма не найден")));
+                .writeValueAsString(new ErrorResponse("Фильма с идентификатором 2 нет")));
 
         getListFilmsMustHaveNotUpdateFilm();
     }
@@ -456,7 +456,7 @@ public class FilmControllerTest {
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Идентификатор фильма не найден")));
+                .writeValueAsString(new ErrorResponse("Фильма с идентификатором 4 нет")));
 
         var checkListFilmsRequest = get("/films")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -542,7 +542,7 @@ public class FilmControllerTest {
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Идентификатор фильма не найден")));
+                .writeValueAsString(new ErrorResponse("Фильма с идентификатором 2 нет")));
 
     }
 
@@ -571,7 +571,7 @@ public class FilmControllerTest {
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
+                .writeValueAsString(new ErrorResponse("Пользователя с идентификатором 2 нет")));
 
     }
 
@@ -606,7 +606,7 @@ public class FilmControllerTest {
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Идентификатор фильма не найден")));
+                .writeValueAsString(new ErrorResponse("Фильма с идентификатором 2 нет")));
 
         var checkListFilmsRequest1 = get("/films")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -653,7 +653,7 @@ public class FilmControllerTest {
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
+                .writeValueAsString(new ErrorResponse("Пользователя с идентификатором 2 нет")));
 
         var checkListFilmsRequest1 = get("/films")
                 .contentType(MediaType.APPLICATION_JSON)

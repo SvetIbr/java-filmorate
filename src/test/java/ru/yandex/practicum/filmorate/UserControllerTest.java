@@ -347,7 +347,7 @@ public class UserControllerTest {
                 .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
+                .writeValueAsString(new ErrorResponse("Пользователя с идентификатором 2 нет")));
 
         getListUsersMustHaveNotUpdateUser();
     }
@@ -496,7 +496,7 @@ public class UserControllerTest {
                 .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
+                .writeValueAsString(new ErrorResponse("Пользователя с идентификатором 4 нет")));
 
         var checkListFilmsRequest = get("/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -629,7 +629,7 @@ public class UserControllerTest {
                 .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
+                .writeValueAsString(new ErrorResponse("Пользователя с идентификатором 3 нет")));
     }
 
     @Test
@@ -660,7 +660,7 @@ public class UserControllerTest {
                 .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
+                .writeValueAsString(new ErrorResponse("Пользователя с идентификатором 7 нет")));
     }
 
     @Test
@@ -792,7 +792,7 @@ public class UserControllerTest {
                 .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
+                .writeValueAsString(new ErrorResponse("Пользователя с идентификатором 3 нет")));
 
         var requestBuilderForCheckFriend = get("/users/1")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -899,7 +899,7 @@ public class UserControllerTest {
                 .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Идентификатор пользователя не найден")));
+                .writeValueAsString(new ErrorResponse("Пользователя с идентификатором 3 нет")));
 
         var requestBuilderForCheckFriend = get("/users/1")
                 .contentType(MediaType.APPLICATION_JSON)
