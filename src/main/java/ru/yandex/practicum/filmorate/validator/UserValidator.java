@@ -29,19 +29,26 @@ public class UserValidator {
             log.error("Пользователь = null");
             throw new ValidationException("Данные для создания пользователя отсутствуют");
         }
-        if (user.getEmail().isBlank()
+        if (user.getEmail() == null
+                || user.getEmail().isBlank()
                 || user.getEmail().isEmpty()
                 || !user.getEmail().contains("@")) {
             log.error("Некорректный email пользователя");
             throw new ValidationException("Email пользователя не может быть пустым " +
                     "и должен содержать \"@\"");
         }
-        if (user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
+        if (user.getLogin() == null
+                || user.getLogin().isEmpty()
+                || user.getLogin().contains(" ")) {
             log.error("Логин пользователя пустой или содержит пробелы");
             throw new ValidationException("Логин пользователя не может быть пустым " +
                     "и не должен содержать пробелы");
         }
         LocalDate now = LocalDate.now();
+        if (user.getBirthday() == null) {
+            log.error("Дата рождения пользователя null");
+            throw new ValidationException("Дата рождения пользователя не указана");
+        }
         if (user.getBirthday().isAfter(now)) {
             log.error("Дата рождения пользователя в будущем");
             throw new ValidationException("Дата рождения пользователя не может быть в будущем");
