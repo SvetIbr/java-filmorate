@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 /**
- * Класс фильма со свойствами <b>id</b>, <b>name</b>, <b>description</b>, <b>releaseDate</b> и <b>duration</b>
+ * Класс фильма со свойствами <b>id</b>, <b>name</b>, <b>description</b>,
+ * <b>releaseDate</b>, <b>duration</b> и <b>likes</b>
  *
  * @version 1.0
  * @autor Светлана Ибраева
@@ -17,7 +19,7 @@ public class Film {
     /**
      * Поле идентификатор
      */
-    private int id;
+    private Long id;
     /**
      * Поле наименование
      */
@@ -34,5 +36,8 @@ public class Film {
      * Поле продолжительность
      */
     private final long duration;
-
+    /**
+     * Поле список лайков
+     */
+    private Set<Long> likes;
 }
