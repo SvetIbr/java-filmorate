@@ -51,9 +51,9 @@ public class FilmService {
      * @throws ValidationException если объект не прошел валидацию
      */
     public Film createFilm(Film film) {
-        if (film.getId() == null) {
-            film.setId(0L);
-        }
+//        if (film.getId() == null) {
+//            film.setId(0L);
+//        }
         if (film.getId() > 0) {
             log.error("Попытка добавить фильм со своим идентификатором " +
                     "(при создании генерируется автоматически)");

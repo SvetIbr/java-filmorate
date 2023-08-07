@@ -16,10 +16,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 public class Film {
-    /**
-     * Поле идентификатор
-     */
-    private Long id;
+    private long id;
     /**
      * Поле наименование
      */
@@ -40,4 +37,13 @@ public class Film {
      * Поле список лайков
      */
     private Set<Long> likes;
+    /**
+     * Поле рейтинг фильма
+     */
+    private final Rating rating;
+
+    /**
+     * Поле список жанров фильма
+     */
+    private final Set<Genre> genres;
 }

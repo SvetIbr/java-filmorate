@@ -16,10 +16,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 public class User {
-    /**
-     * Поле идентификатор
-     */
-    private Long id;
+    private long id;
     /**
      * Поле электронная почта
      */
@@ -37,7 +34,16 @@ public class User {
      */
     private final LocalDate birthday;
     /**
-     * Поле список друзей
+     * Поле список друзей (взаимная подписка)
      */
     private Set<Long> friends;
+    /**
+     * Поле список подписчиков
+     */
+    private Set<Long> followers;
+    /**
+     * Поле список подписок
+     */
+    private Set<Long> followings;
+
 }

@@ -46,9 +46,9 @@ public class UserService {
      * @throws ValidationException если объект не прошел валидацию
      */
     public User createUser(User user) {
-        if (user.getId() == null) {
-            user.setId(0L);
-        }
+//        if (user.getId() == null) {
+//            user.setId(0L);
+//        }
         if (user.getId() > 0) {
             log.error("Попытка добавить пользователя со своим идентификатором " +
                     "(при создании генерируется автоматически)");
