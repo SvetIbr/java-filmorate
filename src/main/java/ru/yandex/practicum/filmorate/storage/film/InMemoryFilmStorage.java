@@ -67,6 +67,14 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .collect(Collectors.toList());
     }
 
+    public Set<Long> loadLikes(Film film) {
+        return films.get(film.getId()).getLikes();
+    }
+
+    public boolean checkLike(Long idFilm, Long idUser) {
+        return films.get(idFilm).getLikes().contains(idUser);
+    }
+
     private void checkId(Long id) {
         if (!films.containsKey(id)) {
             log.error(String.format("Фильма с идентификатором %d нет", id));

@@ -96,7 +96,6 @@ public class UserController {
      *
      * @param id,friendId идентификатор пользователя, который отправляет запрос на удаление,
      *                    идентификатор пользователя, которого удаляют из друзей
-     * @return копию объекта user, которого удалили из друзей
      */
     @DeleteMapping("/{id}/friends/{friendId}")
     public void deleteFromFriends(@PathVariable Long id, @PathVariable Long friendId) {

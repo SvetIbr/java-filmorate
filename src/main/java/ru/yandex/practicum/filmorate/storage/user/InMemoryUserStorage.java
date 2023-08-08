@@ -40,22 +40,25 @@ public class InMemoryUserStorage implements UserStorage {
         numberId = 1L;
     }
 
+    public User getUserById(Long id) {
+        checkId(id);
+        return users.get(id);
+    }
+
     public void addToFriends(Long idUser, Long idFriend) {
         checkId(idUser);
         checkId(idFriend);
-        users.get(idUser).getFriends().add(idFriend);
         users.get(idFriend).getFriends().add(idUser);
         log.info("Пользователь " + users.get(idUser).getName()
-                + " добавил в друзья " + users.get(idFriend).getName());
+                + " добавлен в друзья пользователю" + users.get(idFriend).getName());
     }
 
     public void deleteFromFriends(Long idUser, Long idFriend) {
         checkId(idUser);
         checkId(idFriend);
-        users.get(idUser).getFriends().remove(idFriend);
         users.get(idFriend).getFriends().remove(idUser);
         log.info("Пользователь " + users.get(idUser).getName()
-                + " удалил из друзей " + users.get(idFriend).getName());
+                + " удалился из друзей у " + users.get(idFriend).getName());
     }
 
     public List<User> getFriendsByUser(Long idUser) {
@@ -83,15 +86,21 @@ public class InMemoryUserStorage implements UserStorage {
         return commonFriends;
     }
 
-    public User getUserById(Long id) {
-        checkId(id);
-        return users.get(id);
-    }
-
     public Set<Long>loadFriends (User user) {
         return users.get(user.getId()).getFriends();
     }
 
+    public boolean checkFriendship(Long userId, Long friendId, Boolean confirmed) {
+        return users.get(userId).getFriends().contains(friendId) == confirmed;
+    }
+
+    public void acceptToFriends(Long idUser, Long idFriend) {
+        users.get(idFriend).getFriends().add(idUser);
+    }
+
+    public void deleteFromConfirmFriends(Long idUser, Long idFriend) {
+        users.get(idFriend).getFriends().remove(idUser);
+    }
     private void checkId(Long id) {
         if (!users.containsKey(id)) {
             log.error(String.format("Пользователя с идентификатором %d нет", id));

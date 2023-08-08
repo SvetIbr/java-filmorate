@@ -20,11 +20,13 @@ public class UserDbStorage implements UserStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @Override
     public List<User> findAllUsers() {
         String sql = "SELECT * FROM users ORDER BY user_id";
         return jdbcTemplate.query(sql, this::makeUser);
     }
 
+    @Override
     public User createUser(User user) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
@@ -40,17 +42,20 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
+    @Override
     public User updateUser(User user) {
         String sql = "UPDATE users SET login = ?, email = ?, name = ?, birthday = ? WHERE user_id = ?";
         jdbcTemplate.update(sql, user.getLogin(), user.getEmail(), user.getName(), user.getBirthday(), user.getId());
         return user;
     }
 
+    @Override
     public void deleteAllUsers() {
         String sql = "DELETE FROM users";
         jdbcTemplate.update(sql);
     }
 
+    @Override
     public User getUserById(Long id) {
         String sql = "SELECT * FROM users WHERE user_id = ?";
         List<User> result = jdbcTemplate.query(sql, this::makeUser, id);
@@ -60,21 +65,25 @@ public class UserDbStorage implements UserStorage {
         return result.get(0);
     }
 
+    @Override
     public void addToFriends(Long idUser, Long idFriend) {
         String sql = "INSERT INTO friendship (user_id1, user_id2, confirmed) VALUES(?, ?, ?)";
         jdbcTemplate.update(sql, idUser, idFriend, false);
     }
 
+    @Override
     public void deleteFromFriends(Long idUser, Long idFriend) {
         String sql = "DELETE FROM friendship WHERE user_id1 = ? AND user_id2 = ?";
         jdbcTemplate.update(sql, idUser, idFriend);
     }
 
+    @Override
     public List<User> getFriendsByUser(Long idUser) {
         String sql = "SELECT * FROM users WHERE user_id IN (SELECT user_id1 FROM friendship WHERE user_id2 = ?)";
         return jdbcTemplate.query(sql, this::makeUser, idUser);
     }
 
+    @Override
     public List<User> getCommonFriends(Long idUser, Long otherId) {
         String sql = "SELECT * FROM users WHERE user_id IN " +
                 "((SELECT user_id1 FROM friendship WHERE user_id2 = ?) " +
@@ -92,6 +101,7 @@ public class UserDbStorage implements UserStorage {
         return new User(id, email, login, name, birthday);
     }
 
+    @Override
     public Set<Long> loadFriends (User user) {
         String sql = "(SELECT user_id2 id FROM friendship  WHERE user_id1 = ?) " +
                 "UNION (SELECT user_id1 id FROM friendship  WHERE user_id2 = ? AND  confirmed = true)";
@@ -103,12 +113,14 @@ public class UserDbStorage implements UserStorage {
         return friends;
     }
 
+    @Override
     public boolean checkFriendship(Long userId, Long friendId, Boolean confirmed) {
         String sql = "SELECT * FROM friendship WHERE user_id1 = ? AND user_id2 = ? AND  confirmed = ?";
         SqlRowSet rows = jdbcTemplate.queryForRowSet(sql, userId, friendId, confirmed);
         return rows.next();
     }
 
+    @Override
     public void acceptToFriends(Long idUser, Long idFriend) {
         String sql = "UPDATE friendship SET user_id1 = ?, user_id2 = ?, confirmed = ? " +
                         "WHERE user_id1 = ? AND user_id2 = ?";
@@ -116,6 +128,7 @@ public class UserDbStorage implements UserStorage {
 
     }
 
+    @Override
     public void deleteFromConfirmFriends(Long idUser, Long idFriend) {
         String sql = "UPDATE friendship SET user_id1 = ?, user_id2 = ?, confirmed = ? " +
                 "WHERE user_id1 = ? AND user_id2 = ?";

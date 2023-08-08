@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Интерфейс хранилища пользователей
@@ -72,4 +73,7 @@ public interface FilmStorage {
      * @return список фильмов, сформированных по количеству лайков
      */
     List<Film> getPopularFilm(Integer count);
+
+    Set<Long> loadLikes(Film film);
+    boolean checkLike(Long idFilm, Long idUser);
 }

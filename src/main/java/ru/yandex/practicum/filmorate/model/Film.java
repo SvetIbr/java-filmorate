@@ -8,7 +8,7 @@ import java.util.Set;
 
 /**
  * Класс фильма со свойствами <b>id</b>, <b>name</b>, <b>description</b>,
- * <b>releaseDate</b>, <b>duration</b> и <b>likes</b>
+ * <b>releaseDate</b>, <b>duration</b>, <b>likes</b>, <b>rating</b> и <b>genres</b>
  *
  * @version 1.0
  * @autor Светлана Ибраева
@@ -23,19 +23,19 @@ public class Film {
     /**
      * Поле наименование
      */
-    private final String name;
+    private String name;
     /**
      * Поле описание
      */
-    private final String description;
+    private String description;
     /**
      * Поле дата релиза
      */
-    private final LocalDate releaseDate;
+    private LocalDate releaseDate;
     /**
      * Поле продолжительность
      */
-    private final long duration;
+    private long duration;
     /**
      * Поле список лайков
      */
@@ -43,10 +43,13 @@ public class Film {
     /**
      * Поле рейтинг фильма
      */
-    private final Rating rating;
+    private Rating rating;
 
     /**
      * Поле список жанров фильма
      */
-    private final Set<Genre> genres;
+    private Set<Genre> genres;
+
+    public Film() {
+    }
 }

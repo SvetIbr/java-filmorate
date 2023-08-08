@@ -1,16 +1,14 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Setter
 @ToString
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class Rating {
 
+    private Long id;
     private String name;
-    public Rating(String name) {
-        this.name = name;
-    }
 }
