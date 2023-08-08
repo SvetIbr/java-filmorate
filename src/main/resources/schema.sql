@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS films_likes (
 CREATE TABLE IF NOT EXISTS friendship (
     user_id1  bigint    NOT NULL,
     user_id2  bigint    NOT NULL,
-    STATUS ENUM('FRIEND', 'FOLLOWED', 'FOLLOWING')   NOT NULL,
+    confirmed boolean   NOT NULL,
     CONSTRAINT pk_friendship PRIMARY KEY (user_id1, user_id2),
     CONSTRAINT fk_friendship_user_id1 FOREIGN KEY(user_id1) REFERENCES users (user_id) ON DELETE CASCADE,
     CONSTRAINT fk_friendship_user_id2 FOREIGN KEY(user_id2) REFERENCES users (user_id) ON DELETE CASCADE

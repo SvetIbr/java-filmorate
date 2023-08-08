@@ -20,10 +20,9 @@ public class InMemoryUserStorage implements UserStorage {
 
     public User createUser(User user) {
         user.setId(numberId);
-        user.setFriends(new HashSet<>());
         numberId++;
+        user.setFriends(new HashSet<>());
         users.put(user.getId(), user);
-        log.info("Добавлен пользователь: " + user);
         return user;
     }
 
@@ -33,7 +32,6 @@ public class InMemoryUserStorage implements UserStorage {
             user.setFriends(new HashSet<>());
         }
         users.put(user.getId(), user);
-        log.info("Обновлен пользователь: " + user);
         return user;
     }
 
@@ -42,24 +40,22 @@ public class InMemoryUserStorage implements UserStorage {
         numberId = 1L;
     }
 
-    public User addToFriends(Long idUser, Long idFriend) {
+    public void addToFriends(Long idUser, Long idFriend) {
         checkId(idUser);
         checkId(idFriend);
         users.get(idUser).getFriends().add(idFriend);
         users.get(idFriend).getFriends().add(idUser);
         log.info("Пользователь " + users.get(idUser).getName()
                 + " добавил в друзья " + users.get(idFriend).getName());
-        return users.get(idFriend);
     }
 
-    public User deleteFromFriends(Long idUser, Long idFriend) {
+    public void deleteFromFriends(Long idUser, Long idFriend) {
         checkId(idUser);
         checkId(idFriend);
         users.get(idUser).getFriends().remove(idFriend);
         users.get(idFriend).getFriends().remove(idUser);
         log.info("Пользователь " + users.get(idUser).getName()
                 + " удалил из друзей " + users.get(idFriend).getName());
-        return users.get(idFriend);
     }
 
     public List<User> getFriendsByUser(Long idUser) {
@@ -90,6 +86,10 @@ public class InMemoryUserStorage implements UserStorage {
     public User getUserById(Long id) {
         checkId(id);
         return users.get(id);
+    }
+
+    public Set<Long>loadFriends (User user) {
+        return users.get(user.getId()).getFriends();
     }
 
     private void checkId(Long id) {

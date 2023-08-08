@@ -85,11 +85,10 @@ public class UserController {
      *
      * @param id,friendId идентификатор пользователя, который отправляет запрос на добавление,
      *                    идентификатор пользователя, которого добавляют в друзья
-     * @return копию объекта user, которого добавили в друзья
      */
     @PutMapping("/{id}/friends/{friendId}")
-    public User addToFriends(@PathVariable Long id, @PathVariable Long friendId) {
-        return service.addToFriends(id, friendId);
+    public void addToFriends(@PathVariable Long id, @PathVariable Long friendId) {
+        service.addToFriends(id, friendId);
     }
 
     /**
@@ -100,8 +99,8 @@ public class UserController {
      * @return копию объекта user, которого удалили из друзей
      */
     @DeleteMapping("/{id}/friends/{friendId}")
-    public User deleteFromFriends(@PathVariable Long id, @PathVariable Long friendId) {
-        return service.deleteFromFriends(id, friendId);
+    public void deleteFromFriends(@PathVariable Long id, @PathVariable Long friendId) {
+        service.deleteFromFriends(id, friendId);
     }
 
     /**

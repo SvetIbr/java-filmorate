@@ -16,7 +16,10 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 public class Film {
-    private long id;
+    /**
+     * Поле идентификатор
+     */
+    private Long id;
     /**
      * Поле наименование
      */

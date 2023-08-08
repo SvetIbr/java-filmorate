@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Интерфейс хранилища пользователей
@@ -52,18 +53,16 @@ public interface UserStorage {
      *
      * @param idUser,idFriend идентификатор пользователя, который отправляет запрос на добавление,
      *                        идентификатор пользователя, которого добавляют в друзья
-     * @return копию объекта user, которого добавили в друзья
      */
-    User addToFriends(Long idUser, Long idFriend);
+    void addToFriends(Long idUser, Long idFriend);
 
     /**
      * Метод удаления пользователей из хранилища из списка друзей друг друга
      *
      * @param idUser,idFriend идентификатор пользователя, который отправляет запрос на удаление,
      *                        идентификатор пользователя, которого удаляют из друзей
-     * @return копию объекта user, которого удалили из друзей
      */
-    User deleteFromFriends(Long idUser, Long idFriend);
+    void deleteFromFriends(Long idUser, Long idFriend);
 
     /**
      * Метод получения списка друзей пользователя по идентификатору из хранилища
@@ -81,4 +80,11 @@ public interface UserStorage {
      * @return список общих друзей двух пользователей
      */
     List<User> getCommonFriends(Long idUser, Long otherId);
+
+    Set<Long> loadFriends(User user);
+    boolean checkFriendship(Long userId, Long friendId, Boolean confirmed);
+
+    void acceptToFriends(Long idUser, Long idFriend);
+
+    void deleteFromConfirmFriends(Long idUser, Long idFriend);
 }

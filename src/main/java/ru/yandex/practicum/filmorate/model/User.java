@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -16,7 +17,10 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 public class User {
-    private long id;
+    /**
+     * Поле идентификатор
+     */
+    private Long id;
     /**
      * Поле электронная почта
      */
@@ -34,16 +38,16 @@ public class User {
      */
     private final LocalDate birthday;
     /**
-     * Поле список друзей (взаимная подписка)
+     * Поле список друзей
      */
     private Set<Long> friends;
-    /**
-     * Поле список подписчиков
-     */
-    private Set<Long> followers;
-    /**
-     * Поле список подписок
-     */
-    private Set<Long> followings;
 
+    public User(Long id, String email, String login, String name, LocalDate birthday) {
+        this.id = id;
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
+        this.friends = new HashSet<>();
+    }
 }
