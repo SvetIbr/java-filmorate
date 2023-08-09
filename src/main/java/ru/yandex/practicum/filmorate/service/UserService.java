@@ -29,17 +29,26 @@ public class UserService {
      * Поле валидатор
      */
     private final UserValidator validator;
+
+    /**
+     * Конструктор - создание нового объекта с определенными значениями
+     * @param storage - хранилище пользователей
+     * @param validator - валидатор пользователей
+     */
     public UserService(@Qualifier("userDbStorage") UserStorage storage, UserValidator validator) {
         this.storage = storage;
         this.validator = validator;
     }
+
     /**
      * Метод получения всего списка пользователей из хранилища сервиса
      *
      * @return список всех пользователей
      */
     public List<User> findAllUsers() {
-        return storage.findAllUsers();
+        List<User> users = storage.findAllUsers();
+        users.forEach(user -> user.setFriends(storage.getIdFriendsByUser(user)));
+        return users;
     }
 
     /**
@@ -85,13 +94,10 @@ public class UserService {
             throw new ValidationException("У пользователя не хватает идентификатора для обновления");
         }
         Long checkId = user.getId();
-        User checkUser = storage.getUserById(checkId);
-        if (checkUser == null) {
-            throw new NotFoundException("Пользователь с идентификатором " + checkId + " не найден");
-        }
+        checkUserId(checkId);
         validator.validate(user);
         user = storage.updateUser(user);
-        user.setFriends(storage.loadFriends(user));
+        user.setFriends(storage.getIdFriendsByUser(user));
         log.info("Обновлен пользователь: " + user);
         return user;
     }
@@ -114,7 +120,7 @@ public class UserService {
         if (user == null) {
             throw new NotFoundException("Пользователь с идентификтором " + id + " не найден");
         }
-        user.setFriends(storage.loadFriends(user));
+        user.setFriends(storage.getIdFriendsByUser(user));
         return user;
     }
 
@@ -125,19 +131,8 @@ public class UserService {
      *                        идентификатор пользователя, которого добавляют в друзья
      */
     public void addToFriends(Long idUser, Long idFriend) {
-        User user = this.getUserById(idUser);
-        User friend = this.getUserById(idFriend);
-        String message = "Не найден пользователь с идентификатором ";
-        if (user == null) {
-            message = message + idUser;
-            log.warn(message);
-            throw  new NotFoundException(message);
-        }
-        if (friend == null) {
-            message = message + idFriend;
-            log.warn(message);
-            throw new NotFoundException(message);
-        }
+        checkUserId(idUser);
+        checkUserId(idFriend);
         // Eсли пользователь уже отправил запрос и он не был принят
         if (storage.checkFriendship(idUser, idFriend, false)) {
             log.warn("Пользователь " + idUser + " уже отправлял запрос в друзья пользователю " + idFriend);
@@ -147,10 +142,14 @@ public class UserService {
         if (!storage.checkFriendship(idUser, idFriend, false)
         && !storage.checkFriendship(idFriend, idUser, false)) {
             storage.addToFriends(idUser, idFriend);
+            log.info("Пользователь " + idUser
+                    + " добавлен в друзья пользователю" + idFriend);
         }
         // Eсли пользователь отправляет взаимный запрос и попадает в друзья
         if (storage.checkFriendship(idFriend, idUser, false)) {
             storage.acceptToFriends(idUser, idFriend);
+            log.info("Пользователь " + idUser
+                    + " одобрил заявку в друзья пользователю" + idFriend);
         }
     }
 
@@ -161,19 +160,8 @@ public class UserService {
      *                        идентификатор пользователя, которого удаляют из друзей
      */
     public void deleteFromFriends(Long idUser, Long idFriend) {
-        User user = this.getUserById(idUser);
-        User friend = this.getUserById(idFriend);
-        String message = "Не найден пользователь с идентификатором ";
-        if (user == null) {
-            message = message + idUser;
-            log.warn(message);
-            throw  new NotFoundException(message);
-        }
-        if (friend == null) {
-            message = message + idFriend;
-            log.warn(message);
-            throw new NotFoundException(message);
-        }
+        checkUserId(idUser);
+        checkUserId(idFriend);
         // Eсли пользователь не отправлял запрос
         if (!storage.checkFriendship(idUser, idFriend, false)) {
             log.warn("Пользователь " + idUser + " не отправлял запрос в друзья пользователю " + idFriend);
@@ -182,11 +170,15 @@ public class UserService {
         // Eсли пользователь отправлял запрос и его не одобрили
         if (storage.checkFriendship(idUser, idFriend, false)) {
             storage.deleteFromFriends(idUser, idFriend);
+            log.info("Пользователь " + idUser
+                    + " удалился из друзей у " + idFriend);
         }
-        // Eсли пользователь был в друзьях - оставить друга в подписчиках
+        // Eсли пользователь был в друзьях
         if (storage.checkFriendship(idUser, idFriend, true)
         || storage.checkFriendship(idFriend, idUser, true)) {
             storage.deleteFromConfirmFriends(idUser, idFriend);
+            log.info("Пользователь " + idUser
+                    + " удалился из друзей у " + idFriend);
         }
     }
 
@@ -197,7 +189,10 @@ public class UserService {
      * @return список друзей пользователя
      */
     public List<User> getFriendsByUser(Long idUser) {
-        return storage.getFriendsByUser(idUser);
+        checkUserId(idUser);
+        List<User> friends = storage.getFriendsByUser(idUser);
+        friends.forEach(user -> user.setFriends(storage.getIdFriendsByUser(user)));
+        return friends;
     }
 
     /**
@@ -208,6 +203,22 @@ public class UserService {
      * @return список общих друзей двух пользователей
      */
     public List<User> getCommonFriends(Long idUser, Long otherId) {
-        return storage.getCommonFriends(idUser, otherId);
+        checkUserId(idUser);
+        checkUserId(otherId);
+        List<User> commonFriends = storage.getCommonFriends(idUser, otherId);
+        commonFriends.forEach(user -> user.setFriends(storage.getIdFriendsByUser(user)));
+        return commonFriends;
+    }
+
+    /**
+     * Метод проверки наличия в хранилище пользователей пользователя по идентификатору
+     *
+     * @param id идентификатор
+     */
+    private void checkUserId(Long id) {
+        User user = storage.getUserById(id);
+        if (user == null) {
+            throw new NotFoundException("Пользователь с идентификатором " + id + " не найден");
+        }
     }
 }

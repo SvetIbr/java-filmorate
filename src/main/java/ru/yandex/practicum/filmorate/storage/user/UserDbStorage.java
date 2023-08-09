@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -16,17 +17,16 @@ import java.util.*;
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
+    @Autowired
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    @Override
     public List<User> findAllUsers() {
         String sql = "SELECT * FROM users ORDER BY user_id";
         return jdbcTemplate.query(sql, this::makeUser);
     }
 
-    @Override
     public User createUser(User user) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("users")
@@ -42,20 +42,20 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
-    @Override
     public User updateUser(User user) {
-        String sql = "UPDATE users SET login = ?, email = ?, name = ?, birthday = ? WHERE user_id = ?";
-        jdbcTemplate.update(sql, user.getLogin(), user.getEmail(), user.getName(), user.getBirthday(), user.getId());
+        String sql = "UPDATE users " +
+                     "SET login = ?, email = ?, name = ?, birthday = ? " +
+                     "WHERE user_id = ?";
+        jdbcTemplate.update(sql, user.getLogin(), user.getEmail(),
+                user.getName(), user.getBirthday(), user.getId());
         return user;
     }
 
-    @Override
     public void deleteAllUsers() {
         String sql = "DELETE FROM users";
         jdbcTemplate.update(sql);
     }
 
-    @Override
     public User getUserById(Long id) {
         String sql = "SELECT * FROM users WHERE user_id = ?";
         List<User> result = jdbcTemplate.query(sql, this::makeUser, id);
@@ -65,44 +65,33 @@ public class UserDbStorage implements UserStorage {
         return result.get(0);
     }
 
-    @Override
     public void addToFriends(Long idUser, Long idFriend) {
         String sql = "INSERT INTO friendship (user_id1, user_id2, confirmed) VALUES(?, ?, ?)";
         jdbcTemplate.update(sql, idUser, idFriend, false);
     }
 
-    @Override
     public void deleteFromFriends(Long idUser, Long idFriend) {
         String sql = "DELETE FROM friendship WHERE user_id1 = ? AND user_id2 = ?";
         jdbcTemplate.update(sql, idUser, idFriend);
     }
 
-    @Override
     public List<User> getFriendsByUser(Long idUser) {
-        String sql = "SELECT * FROM users WHERE user_id IN (SELECT user_id1 FROM friendship WHERE user_id2 = ?)";
+        String sql = "SELECT * FROM users " +
+                "WHERE user_id IN (SELECT user_id1 FROM friendship WHERE user_id2 = ?)";
         return jdbcTemplate.query(sql, this::makeUser, idUser);
     }
 
-    @Override
     public List<User> getCommonFriends(Long idUser, Long otherId) {
-        String sql = "SELECT * FROM users WHERE user_id IN " +
-                "((SELECT user_id1 FROM friendship WHERE user_id2 = ?) " +
-                "FULL JOIN (SELECT user_id1 FROM friendship WHERE user_id2 = ?))";
+        String sql = "SELECT * " +
+                "FROM users " +
+                "WHERE user_id IN " +
+                    "((SELECT user_id1 FROM friendship WHERE user_id2 = ?) " +
+                    "FULL JOIN " +
+                    "(SELECT user_id1 FROM friendship WHERE user_id2 = ?))";
         return jdbcTemplate.query(sql, this::makeUser, idUser, otherId);
     }
 
-    private User makeUser(ResultSet rs, int rowNum) throws SQLException {
-        Long id = rs.getLong("user_id");
-        String email = rs.getString("email");
-        String login = rs.getString("login");
-        String name = rs.getString("name");
-        LocalDate birthday = rs.getDate("birthday").toLocalDate();
-
-        return new User(id, email, login, name, birthday);
-    }
-
-    @Override
-    public Set<Long> loadFriends (User user) {
+    public Set<Long> getIdFriendsByUser (User user) {
         String sql = "(SELECT user_id2 id FROM friendship  WHERE user_id1 = ?) " +
                 "UNION (SELECT user_id1 id FROM friendship  WHERE user_id2 = ? AND  confirmed = true)";
         SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sql, user.getId());
@@ -113,25 +102,37 @@ public class UserDbStorage implements UserStorage {
         return friends;
     }
 
-    @Override
     public boolean checkFriendship(Long userId, Long friendId, Boolean confirmed) {
-        String sql = "SELECT * FROM friendship WHERE user_id1 = ? AND user_id2 = ? AND  confirmed = ?";
+        String sql = "SELECT * FROM friendship " +
+                "WHERE user_id1 = ? AND user_id2 = ? AND  confirmed = ?";
         SqlRowSet rows = jdbcTemplate.queryForRowSet(sql, userId, friendId, confirmed);
         return rows.next();
     }
 
-    @Override
     public void acceptToFriends(Long idUser, Long idFriend) {
-        String sql = "UPDATE friendship SET user_id1 = ?, user_id2 = ?, confirmed = ? " +
-                        "WHERE user_id1 = ? AND user_id2 = ?";
+        String sql = "UPDATE friendship " +
+                     "SET user_id1 = ?, user_id2 = ?, confirmed = ? " +
+                     "WHERE user_id1 = ? AND user_id2 = ?";
         jdbcTemplate.update(sql, idUser, idFriend, true, idUser, idFriend);
 
     }
 
-    @Override
     public void deleteFromConfirmFriends(Long idUser, Long idFriend) {
-        String sql = "UPDATE friendship SET user_id1 = ?, user_id2 = ?, confirmed = ? " +
-                "WHERE user_id1 = ? AND user_id2 = ?";
+        String sql = "UPDATE friendship " +
+                     "SET user_id1 = ?, user_id2 = ?, confirmed = ? " +
+                     "WHERE user_id1 = ? AND user_id2 = ?";
         jdbcTemplate.update(sql, idFriend, idUser, false, idFriend, idUser);
+    }
+
+    private User makeUser(ResultSet rs, int rowNum) throws SQLException {
+        Long id = rs.getLong("user_id");
+        String email = rs.getString("email");
+        String login = rs.getString("login");
+        String name = rs.getString("name");
+        LocalDate birthday = rs.getDate("birthday").toLocalDate();
+
+        User user = new User(email, login, name, birthday);
+        user.setId(id);
+        return user;
     }
 }

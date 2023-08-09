@@ -1,9 +1,9 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -14,28 +14,27 @@ import java.util.Set;
  * @autor Светлана Ибраева
  */
 @Data
-@AllArgsConstructor
 public class Film {
     /**
      * Поле идентификатор
      */
     private Long id;
     /**
-     * Поле наименование
+     * Поле название
      */
-    private String name;
+    private final String name;
     /**
      * Поле описание
      */
-    private String description;
+    private final String description;
     /**
      * Поле дата релиза
      */
-    private LocalDate releaseDate;
+    private final LocalDate releaseDate;
     /**
      * Поле продолжительность
      */
-    private long duration;
+    private final long duration;
     /**
      * Поле список лайков
      */
@@ -43,13 +42,29 @@ public class Film {
     /**
      * Поле рейтинг фильма
      */
-    private Rating rating;
+    private final Rating rating;
 
     /**
      * Поле список жанров фильма
      */
     private Set<Genre> genres;
 
-    public Film() {
+    /**
+     * Конструктор - создание нового объекта с определенными значениями
+     *
+     * @param name        - название
+     * @param description - описание
+     * @param releaseDate - дата выхода
+     * @param duration    - продолжительность
+     * @param rating      - рейтинг
+     */
+    public Film(String name, String description, LocalDate releaseDate, long duration, Rating rating) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.rating = rating;
+        this.genres = new HashSet<>();
+        this.likes = new HashSet<>();
     }
 }

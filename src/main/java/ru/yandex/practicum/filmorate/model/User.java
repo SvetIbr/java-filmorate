@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -15,7 +14,7 @@ import java.util.Set;
  * @autor Светлана Ибраева
  */
 @Data
-@AllArgsConstructor
+//@AllArgsConstructor
 public class User {
     /**
      * Поле идентификатор
@@ -30,7 +29,7 @@ public class User {
      */
     private final String login;
     /**
-     * Поле имя
+     * Поле никнейм
      */
     private String name;
     /**
@@ -42,8 +41,15 @@ public class User {
      */
     private Set<Long> friends;
 
-    public User(Long id, String email, String login, String name, LocalDate birthday) {
-        this.id = id;
+    /**
+     * Конструктор - создание нового объекта с определенными значениями
+     *
+     * @param email    - электронная почта
+     * @param login    - логин
+     * @param name     - никнейм
+     * @param birthday - дата рождения
+     */
+    public User(String email, String login, String name, LocalDate birthday) {
         this.email = email;
         this.login = login;
         this.name = name;

@@ -11,18 +11,39 @@ import ru.yandex.practicum.filmorate.service.RatingService;
 
 import java.util.List;
 
+/**
+ * Класс контроллера для работы с запросами к сервису рейтингов
+ *
+ * @author Светлана Ибраева
+ * @version 1.0
+ */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/mpa")
 public class RatingController {
 
+    /**
+     * Поле сервис для работы с хранилищем рейтингов
+     */
     private final RatingService service;
+
+    /**
+     * Метод получения всего списка рейтингов через запрос
+     *
+     * @return список всех рейтингов
+     */
     @GetMapping
     public List<Rating> findAll() {
         return service.findAllRatings();
     }
 
+    /**
+     * Метод получения рейтинга по идентификатору из хранилища сервиса через запрос
+     *
+     * @param id идентификатор
+     * @return копию объекта rating с указанным идентификатором
+     */
     @GetMapping("/{id}")
     public Rating findRatingById(@PathVariable Long id) {
         return service.findRatingById(id);

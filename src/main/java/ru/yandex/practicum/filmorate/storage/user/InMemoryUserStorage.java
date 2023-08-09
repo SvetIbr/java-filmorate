@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 
@@ -27,7 +26,6 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public User updateUser(User user) {
-        checkId(user.getId());
         if (user.getFriends() == null) {
             user.setFriends(new HashSet<>());
         }
@@ -41,28 +39,18 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public User getUserById(Long id) {
-        checkId(id);
-        return users.get(id);
+        return users.getOrDefault(id, null);
     }
 
     public void addToFriends(Long idUser, Long idFriend) {
-        checkId(idUser);
-        checkId(idFriend);
         users.get(idFriend).getFriends().add(idUser);
-        log.info("Пользователь " + users.get(idUser).getName()
-                + " добавлен в друзья пользователю" + users.get(idFriend).getName());
     }
 
     public void deleteFromFriends(Long idUser, Long idFriend) {
-        checkId(idUser);
-        checkId(idFriend);
         users.get(idFriend).getFriends().remove(idUser);
-        log.info("Пользователь " + users.get(idUser).getName()
-                + " удалился из друзей у " + users.get(idFriend).getName());
     }
 
     public List<User> getFriendsByUser(Long idUser) {
-        checkId(idUser);
         List<User> friends = new ArrayList<>();
         if (!users.get(idUser).getFriends().isEmpty()) {
             for (Long cur : users.get(idUser).getFriends()) {
@@ -73,8 +61,6 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public List<User> getCommonFriends(Long idUser, Long otherId) {
-        checkId(idUser);
-        checkId(otherId);
         List<User> commonFriends = new ArrayList<>();
         if (!users.get(idUser).getFriends().isEmpty() || !users.get(otherId).getFriends().isEmpty()) {
             for (Long cur : users.get(idUser).getFriends()) {
@@ -86,7 +72,7 @@ public class InMemoryUserStorage implements UserStorage {
         return commonFriends;
     }
 
-    public Set<Long>loadFriends (User user) {
+    public Set<Long> getIdFriendsByUser(User user) {
         return users.get(user.getId()).getFriends();
     }
 
@@ -100,12 +86,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     public void deleteFromConfirmFriends(Long idUser, Long idFriend) {
         users.get(idFriend).getFriends().remove(idUser);
-    }
-    private void checkId(Long id) {
-        if (!users.containsKey(id)) {
-            log.error(String.format("Пользователя с идентификатором %d нет", id));
-            throw new NotFoundException(String.format("Пользователя с идентификатором %d нет", id));
-        }
     }
 }
 

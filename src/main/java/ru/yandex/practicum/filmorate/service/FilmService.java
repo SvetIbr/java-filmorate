@@ -36,8 +36,18 @@ public class FilmService {
      * Поле валидатор
      */
     private final FilmValidator validator;
+    /**
+     * Поле хранилище жанров
+     */
     private final GenreStorage genreStorage;
 
+    /**
+     * Конструктор - создание нового объекта с определенными значениями
+     * @param storage - хранилище фильмов
+     * @param userStorage - хранилище пользователей
+     * @param validator - валидатор фильмов
+     * @param genreStorage - хранилище жанров
+     */
     public FilmService(@Qualifier("filmDbStorage")FilmStorage storage,
                        @Qualifier("userDbStorage")UserStorage userStorage,
                        FilmValidator validator,
@@ -57,11 +67,6 @@ public class FilmService {
         List<Film> films = storage.findAllFilms();
         films.forEach(this::loadGenresAndLikes);
         return films;
-    }
-
-    private void loadGenresAndLikes(Film film) {
-        film.setGenres(genreStorage.getGenresByFilm(film));
-        film.setLikes(storage.loadLikes(film));
     }
 
     /**
@@ -104,15 +109,12 @@ public class FilmService {
             throw new ValidationException("У фильма не хватает идентификатора для обновления");
         }
         Long checkId = film.getId();
-        Film checkFilm = storage.getFilmById(checkId);
-        if (checkFilm == null) {
-            throw new NotFoundException("Фильм с идентификатором " + checkId + " не найден");
-        }
+        checkFilmId(checkId);
         validator.validate(film);
         film = storage.updateFilm(film);
-        film.setLikes(storage.loadLikes(film));
+        film.setLikes(storage.getLikesByFilm(film));
         film.setGenres(genreStorage.getGenresByFilm(film));
-        log.info("Обновлен пользователь: " + film);
+        log.info("Обновлен фильм: " + film);
         return film;
     }
 
@@ -134,7 +136,7 @@ public class FilmService {
         if (film == null) {
             throw new NotFoundException("Фильм с идентификатором " + id + " не найден");
         }
-        film.setLikes(storage.loadLikes(film));
+        film.setLikes(storage.getLikesByFilm(film));
         film.setGenres(genreStorage.getGenresByFilm(film));
         return film;
     }
@@ -147,14 +149,8 @@ public class FilmService {
      *                      который ставит лайк {@link ru.yandex.practicum.filmorate.model.User}
      */
     public void addLikeToFilm(Long idFilm, Long idUser) {
-        User user = userStorage.getUserById(idUser);
-        if (user == null) {
-            throw new NotFoundException("Пользователь с идентификатором " + idUser + " не найден");
-        }
-        Film film = storage.getFilmById(idFilm);
-        if (film == null) {
-            throw new NotFoundException("Фильм с идентификатором " + idFilm + " не найден");
-        }
+        checkUserId(idUser);
+        checkFilmId(idFilm);
         // Если пользователь уже ставил лайк
         if (storage.checkLike(idFilm, idUser)) {
             log.warn("Пользователь " + idUser + " уже поставил лайк фильму " + idFilm);
@@ -175,14 +171,8 @@ public class FilmService {
      *                      который удаляет лайк {@link ru.yandex.practicum.filmorate.model.User}
      */
     public void deleteLikeFromFilm(Long idFilm, Long idUser) {
-        User user = userStorage.getUserById(idUser);
-        if (user == null) {
-            throw new NotFoundException("Пользователь с идентификатором " + idUser + " не найден");
-        }
-        Film film = storage.getFilmById(idFilm);
-        if (film == null) {
-            throw new NotFoundException("Фильм с идентификатором " + idFilm + " не найден");
-        }
+        checkUserId(idUser);
+        checkFilmId(idFilm);
         // Если пользователь еще не ставил лайк
         if (!storage.checkLike(idFilm, idUser)) {
             log.warn("Пользователь " + idUser + " уже не ставил лайк фильму " + idFilm);
@@ -203,5 +193,39 @@ public class FilmService {
      */
     public List<Film> getPopularFilm(Integer count) {
         return storage.getPopularFilm(count);
+    }
+
+    /**
+     * Метод заполнения списков жанров и лайков фильма film
+     *
+     * @param film {@link Film}
+     */
+    private void loadGenresAndLikes(Film film) {
+        film.setGenres(genreStorage.getGenresByFilm(film));
+        film.setLikes(storage.getLikesByFilm(film));
+    }
+
+    /**
+     * Метод проверки наличия в хранилище фильмов фильма по идентификатору
+     *
+     * @param id идентификатор
+     */
+    private void checkFilmId(Long id) {
+        Film film = storage.getFilmById(id);
+        if (film == null) {
+            throw new NotFoundException("Фильм с идентификатором " + id + " не найден");
+        }
+    }
+
+    /**
+     * Метод проверки наличия в хранилище пользователей пользователя по идентификатору
+     *
+     * @param id идентификатор
+     */
+    private void checkUserId(Long id) {
+        User user = userStorage.getUserById(id);
+        if (user == null) {
+            throw new NotFoundException("Пользователь с идентификатором " + id + " не найден");
+        }
     }
 }
