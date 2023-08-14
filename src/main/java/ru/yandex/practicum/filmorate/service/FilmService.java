@@ -6,14 +6,15 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.rating.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * Класс сервиса для работы с хранилищем фильмов
@@ -40,22 +41,26 @@ public class FilmService {
      * Поле хранилище жанров
      */
     private final GenreStorage genreStorage;
+    private final MpaStorage mpaStorage;
 
     /**
      * Конструктор - создание нового объекта с определенными значениями
-     * @param storage - хранилище фильмов
-     * @param userStorage - хранилище пользователей
-     * @param validator - валидатор фильмов
+     *
+     * @param storage      - хранилище фильмов
+     * @param userStorage  - хранилище пользователей
+     * @param validator    - валидатор фильмов
      * @param genreStorage - хранилище жанров
+     * @param mpaStorage   - хранилище рейтингов
      */
-    public FilmService(@Qualifier("filmDbStorage")FilmStorage storage,
-                       @Qualifier("userDbStorage")UserStorage userStorage,
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage storage,
+                       @Qualifier("userDbStorage") UserStorage userStorage,
                        FilmValidator validator,
-                       GenreStorage genreStorage) {
+                       GenreStorage genreStorage, MpaStorage mpaStorage) {
         this.storage = storage;
         this.userStorage = userStorage;
         this.validator = validator;
         this.genreStorage = genreStorage;
+        this.mpaStorage = mpaStorage;
     }
 
     /**
@@ -65,7 +70,7 @@ public class FilmService {
      */
     public List<Film> findAllFilms() {
         List<Film> films = storage.findAllFilms();
-        films.forEach(this::loadGenresAndLikes);
+        films.forEach(this::loadGenresMpaAndLikes);
         return films;
     }
 
@@ -87,13 +92,12 @@ public class FilmService {
                     "(при создании генерируется автоматически)");
         }
         validator.validate(film);
+        Set<Genre> genres = film.getGenres();
         film = storage.createFilm(film);
-        if (film.getLikes() == null) {
-            film.setLikes(new HashSet<>());
+        if (!genres.isEmpty()) {
+            genreStorage.addGenresToFilm(film);
         }
-        if (film.getGenres() == null) {
-            film.setGenres(new HashSet<>());
-        }
+        loadGenresMpaAndLikes(film);
         log.info("Добавлен фильм: " + film);
         return film;
     }
@@ -111,9 +115,9 @@ public class FilmService {
         Long checkId = film.getId();
         checkFilmId(checkId);
         validator.validate(film);
+        genreStorage.updateGenresByFilm(film);
         film = storage.updateFilm(film);
-        film.setLikes(storage.getLikesByFilm(film));
-        film.setGenres(genreStorage.getGenresByFilm(film));
+        loadGenresMpaAndLikes(film);
         log.info("Обновлен фильм: " + film);
         return film;
     }
@@ -136,8 +140,7 @@ public class FilmService {
         if (film == null) {
             throw new NotFoundException("Фильм с идентификатором " + id + " не найден");
         }
-        film.setLikes(storage.getLikesByFilm(film));
-        film.setGenres(genreStorage.getGenresByFilm(film));
+        loadGenresMpaAndLikes(film);
         return film;
     }
 
@@ -156,7 +159,7 @@ public class FilmService {
             log.warn("Пользователь " + idUser + " уже поставил лайк фильму " + idFilm);
             return;
         }
-        // Если еще не ставил
+        // Если пользователь еще не ставил лайк
         if (!storage.checkLike(idFilm, idUser)) {
             storage.addLikeToFilm(idFilm, idUser);
             log.info("Пользователь " + idUser + " поставил лайк фильму " + idFilm);
@@ -178,7 +181,7 @@ public class FilmService {
             log.warn("Пользователь " + idUser + " уже не ставил лайк фильму " + idFilm);
             return;
         }
-        // Если лайк поставил
+        // Если пользватель уже ставил лайк
         if (storage.checkLike(idFilm, idUser)) {
             storage.deleteLikeFromFilm(idFilm, idUser);
             log.info("Пользователь " + idUser + " отменил свой лайк фильму " + idFilm);
@@ -192,7 +195,9 @@ public class FilmService {
      * @return список фильмов, сформированных по количеству лайков
      */
     public List<Film> getPopularFilm(Integer count) {
-        return storage.getPopularFilm(count);
+        List<Film> films = storage.getPopularFilm(count);
+        films.forEach(this::loadGenresMpaAndLikes);
+        return films;
     }
 
     /**
@@ -200,9 +205,10 @@ public class FilmService {
      *
      * @param film {@link Film}
      */
-    private void loadGenresAndLikes(Film film) {
+    private void loadGenresMpaAndLikes(Film film) {
         film.setGenres(genreStorage.getGenresByFilm(film));
         film.setLikes(storage.getLikesByFilm(film));
+        film.setMpa(mpaStorage.findMpaById(film.getMpa().getId()));
     }
 
     /**

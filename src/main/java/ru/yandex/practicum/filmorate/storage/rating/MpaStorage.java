@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.rating;
 
-import ru.yandex.practicum.filmorate.model.Rating;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.List;
 
@@ -10,13 +10,13 @@ import java.util.List;
  * @author Светлана Ибраева
  * @version 1.0
  */
-public interface RatingStorage {
+public interface MpaStorage {
     /**
      * Метод получения всего списка рейтингов из хранилища
      *
      * @return список всех рейтингов
      */
-    List<Rating> findAllRatings();
+    List<Mpa> findAllMpa();
 
     /**
      * Метод получения рейтинга по идентификатору из хранилища сервиса
@@ -24,5 +24,5 @@ public interface RatingStorage {
      * @param id идентификатор
      * @return копию объекта rating с указанным идентификатором
      */
-    Rating findRatingById(Long id);
+    Mpa findMpaById(Long id);
 }

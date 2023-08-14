@@ -14,7 +14,6 @@ import java.util.Set;
  * @autor Светлана Ибраева
  */
 @Data
-//@AllArgsConstructor
 public class User {
     /**
      * Поле идентификатор

@@ -11,6 +11,7 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class Genre {

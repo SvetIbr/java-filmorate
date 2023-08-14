@@ -35,4 +35,18 @@ public interface GenreStorage {
      * @return копию объекта genre с указанным идентификатором
      */
     Genre findGenreById(Long id);
+
+    /**
+     * Метод обновления информации о жанрах фильма в хранилище жанров (удаление старых и добавление новых)
+     *
+     * @param film {@link Film}
+     */
+    void updateGenresByFilm(Film film);
+
+    /**
+     * Метод добавления жанров фильма в хранилище жанров
+     *
+     * @param film {@link Film}
+     */
+    void addGenresToFilm(Film film);
 }

@@ -9,9 +9,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class GenreDbStorage implements GenreStorage {
@@ -22,10 +20,11 @@ public class GenreDbStorage implements GenreStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    @Override
     public Set<Genre> getGenresByFilm(Film film) {
         String sql = "SELECT g.GENRE_ID, g.NAME FROM GENRES g NATURAL JOIN FILMS_GENRES fg WHERE fg.FILM_ID = ?";
-        return new HashSet<>(jdbcTemplate.query(sql, this::makeGenre, film.getId()));
+        List<Genre> genres = jdbcTemplate.query(sql, this::makeGenre, film.getId());
+        genres.sort(Comparator.comparing(Genre::getId));
+        return new HashSet<>(genres);
     }
 
     private Genre makeGenre(ResultSet resultSet, int rowNum) throws SQLException {
@@ -49,5 +48,15 @@ public class GenreDbStorage implements GenreStorage {
         return result.get(0);
     }
 
+    public void updateGenresByFilm(Film film) {
+        jdbcTemplate.update("DELETE FROM films_genres WHERE film_id = ?", film.getId());
+        addGenresToFilm(film);
+    }
 
+    public void addGenresToFilm(Film film) {
+        for (Genre genre : film.getGenres()) {
+            jdbcTemplate.update("INSERT INTO films_genres (film_id, genre_id) VALUES (?, ?)",
+                    film.getId(), genre.getId());
+        }
+    }
 }

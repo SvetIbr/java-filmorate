@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.model.Rating;
-import ru.yandex.practicum.filmorate.service.RatingService;
+import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.service.MpaService;
 
 import java.util.List;
 
@@ -21,12 +21,12 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/mpa")
-public class RatingController {
+public class MpaController {
 
     /**
      * Поле сервис для работы с хранилищем рейтингов
      */
-    private final RatingService service;
+    private final MpaService service;
 
     /**
      * Метод получения всего списка рейтингов через запрос
@@ -34,18 +34,18 @@ public class RatingController {
      * @return список всех рейтингов
      */
     @GetMapping
-    public List<Rating> findAll() {
-        return service.findAllRatings();
+    public List<Mpa> findAll() {
+        return service.findAllMpa();
     }
 
     /**
      * Метод получения рейтинга по идентификатору из хранилища сервиса через запрос
      *
      * @param id идентификатор
-     * @return копию объекта rating с указанным идентификатором
+     * @return копию объекта mpa с указанным идентификатором
      */
     @GetMapping("/{id}")
-    public Rating findRatingById(@PathVariable Long id) {
-        return service.findRatingById(id);
+    public Mpa findMpaById(@PathVariable Long id) {
+        return service.findMpaById(id);
     }
 }

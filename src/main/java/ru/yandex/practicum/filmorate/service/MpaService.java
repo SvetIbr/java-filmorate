@@ -3,8 +3,8 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Rating;
-import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
+import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.rating.MpaStorage;
 
 import java.util.List;
 
@@ -15,11 +15,11 @@ import java.util.List;
  * @version 1.0
  */
 @Service
-public class RatingService {
+public class MpaService {
     /**
      * Поле хранилище рейтингов
      */
-    private final RatingStorage storage;
+    private final MpaStorage storage;
 
     /**
      * Конструктор - создание нового объекта с определенными значениями
@@ -27,7 +27,7 @@ public class RatingService {
      * @param storage - хранилище рейтингов
      */
     @Autowired
-    public RatingService(RatingStorage storage) {
+    public MpaService(MpaStorage storage) {
         this.storage = storage;
     }
 
@@ -36,8 +36,8 @@ public class RatingService {
      *
      * @return список всех рейтингов
      */
-    public List<Rating> findAllRatings() {
-        return storage.findAllRatings();
+    public List<Mpa> findAllMpa() {
+        return storage.findAllMpa();
     }
 
     /**
@@ -46,11 +46,11 @@ public class RatingService {
      * @param id идентификатор
      * @return копию объекта rating с указанным идентификатором
      */
-    public Rating findRatingById(Long id) {
-        Rating rating = storage.findRatingById(id);
-        if (rating == null) {
+    public Mpa findMpaById(Long id) {
+        Mpa mpa = storage.findMpaById(id);
+        if (mpa == null) {
             throw new NotFoundException("Рейтинг с идентификтором " + id + " не найден");
         }
-        return rating;
+        return mpa;
     }
 }

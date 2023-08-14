@@ -76,25 +76,36 @@ public class UserDbStorage implements UserStorage {
     }
 
     public List<User> getFriendsByUser(Long idUser) {
-        String sql = "SELECT * FROM users " +
-                "WHERE user_id IN (SELECT user_id1 FROM friendship WHERE user_id2 = ?)";
+        String sql = "SELECT u.user_id, u.name, u.email, u.login, u.birthday " +
+                "FROM users u " +
+                "WHERE u.user_id IN " +
+                "(SELECT fr.user_id2 " +
+                "FROM friendship fr " +
+                "WHERE fr.user_id1 = ?)";
         return jdbcTemplate.query(sql, this::makeUser, idUser);
     }
 
     public List<User> getCommonFriends(Long idUser, Long otherId) {
-        String sql = "SELECT * " +
-                "FROM users " +
-                "WHERE user_id IN " +
-                    "((SELECT user_id1 FROM friendship WHERE user_id2 = ?) " +
-                    "FULL JOIN " +
-                    "(SELECT user_id1 FROM friendship WHERE user_id2 = ?))";
+        String sql = "WITH u1 AS " +
+                "(SELECT u.* " +
+                "FROM friendship AS f " +
+                "JOIN users AS u ON f.user_id2 = u.user_id " +
+                "WHERE f.user_id1 = ? ), " +
+                "u2 AS " +
+                "(SELECT u.* " +
+                "FROM friendship AS f " +
+                "JOIN users AS u ON f.user_id2 = u.user_id " +
+                "WHERE f.user_id1 = ? ) " +
+                "SELECT u1.* " +
+                "FROM u1 " +
+                "JOIN u2 ON u1.user_id = u2.user_id";
         return jdbcTemplate.query(sql, this::makeUser, idUser, otherId);
     }
 
     public Set<Long> getIdFriendsByUser (User user) {
         String sql = "(SELECT user_id2 id FROM friendship  WHERE user_id1 = ?) " +
                 "UNION (SELECT user_id1 id FROM friendship  WHERE user_id2 = ? AND  confirmed = true)";
-        SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sql, user.getId());
+        SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sql, user.getId(), user.getId());
         Set<Long> friends = new HashSet<>();
         while (sqlRowSet.next()) {
             friends.add(sqlRowSet.getLong("id"));

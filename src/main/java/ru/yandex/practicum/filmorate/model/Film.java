@@ -42,7 +42,7 @@ public class Film {
     /**
      * Поле рейтинг фильма
      */
-    private final Rating rating;
+    private Mpa mpa;
 
     /**
      * Поле список жанров фильма
@@ -56,14 +56,14 @@ public class Film {
      * @param description - описание
      * @param releaseDate - дата выхода
      * @param duration    - продолжительность
-     * @param rating      - рейтинг
+     * @param mpa         - рейтинг
      */
-    public Film(String name, String description, LocalDate releaseDate, long duration, Rating rating) {
+    public Film(String name, String description, LocalDate releaseDate, long duration, Mpa mpa) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-        this.rating = rating;
+        this.mpa = mpa;
         this.genres = new HashSet<>();
         this.likes = new HashSet<>();
     }

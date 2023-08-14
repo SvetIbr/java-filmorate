@@ -6,7 +6,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Rating;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -47,7 +47,7 @@ public class FilmDbStorage implements FilmStorage {
         values.put("description", film.getDescription());
         values.put("release_date", film.getReleaseDate());
         values.put("duration", film.getDuration());
-        values.put("rating_id", film.getRating().getId());
+        values.put("rating_id", film.getMpa().getId());
 
         film.setId(simpleJdbcInsert.executeAndReturnKey(values).longValue());
         return film;
@@ -60,7 +60,7 @@ public class FilmDbStorage implements FilmStorage {
                         "WHERE film_id = ?";
         jdbcTemplate.update(sql, film.getName(), film.getDescription(),
                 film.getReleaseDate(), film.getDuration(),
-                film.getRating().getId(), film.getId());
+                film.getMpa().getId(), film.getId());
 
         return film;
     }
@@ -94,13 +94,13 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public List<Film> getPopularFilm(Integer count) {
-        String sql = "SELECT * FROM films WHERE film_id IN " +
-                "(SELECT film_id " +
-                "FROM films_likes " +
-                "GROUP BY film_id " +
-                "ORDER BY SUM(user_id) DESC " +
-                "LIMIT " + count + ")";
-        return jdbcTemplate.query(sql, this::makeFilm);
+        String sql = "SELECT * " +
+                "FROM films AS f " +
+                "LEFT JOIN films_likes AS fl ON f.film_id = fl.film_id " +
+                "GROUP BY f.film_id " +
+                "ORDER BY COUNT(fl.user_id) " +
+                "DESC LIMIT ?";
+        return jdbcTemplate.query(sql, this::makeFilm, count);
     }
 
     public Set<Long> getLikesByFilm(Film film) {
@@ -128,11 +128,10 @@ public class FilmDbStorage implements FilmStorage {
         String description = resultSet.getString("description");
         LocalDate releaseDate = resultSet.getDate("release_date").toLocalDate();
         int duration = resultSet.getInt("duration");
-        Rating rating = new Rating(resultSet.getLong("rating_id"),
-                resultSet.getString("name"));
-        Film film = new Film(name, description, releaseDate, duration, rating);
+        Mpa mpa = new Mpa();
+        mpa.setId(resultSet.getLong("rating_id"));
+        Film film = new Film(name, description, releaseDate, duration, mpa);
         film.setId(id);
         return film;
     }
-
 }

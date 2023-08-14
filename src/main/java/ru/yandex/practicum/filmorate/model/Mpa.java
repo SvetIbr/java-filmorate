@@ -8,12 +8,8 @@ import lombok.*;
  * @version 1.0
  * @autor Светлана Ибраева
  */
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
-@AllArgsConstructor
-public class Rating {
+@Data
+public class Mpa {
     /**
      * Поле идентификатор
      */
@@ -22,4 +18,8 @@ public class Rating {
      * Поле имя
      */
     private String name;
+    /**
+     * Поле описание
+     */
+    private String description;
 }
