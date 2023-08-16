@@ -89,6 +89,7 @@ class FilmorateApplicationTests {
         assertThat(listUsers).contains(firstUser);
         assertThat(listUsers).contains(secondUser);
     }
+
     @Test
     public void testCreateUserAndGetUserById() {
         firstUser = userStorage.createUser(firstUser);
@@ -108,7 +109,7 @@ class FilmorateApplicationTests {
     @Test
     public void testUpdateUser() {
         firstUser = userStorage.createUser(firstUser);
-        User updateUser =  new User("1update@mail.ru", "firstUpdate", "firstPersonUpdate",
+        User updateUser = new User("1update@mail.ru", "firstUpdate", "firstPersonUpdate",
                 LocalDate.of(1994, 1, 20));
         updateUser.setId(1L);
 
@@ -204,6 +205,7 @@ class FilmorateApplicationTests {
         userStorage.deleteFromFriends(firstUser.getId(), secondUser.getId());
         userStorage.deleteFromFriends(firstUser.getId(), thirdUser.getId());
     }
+
     @Test
     public void testDeleteFromConfirmFriends() {
         firstUser = userStorage.createUser(firstUser);
@@ -374,7 +376,7 @@ class FilmorateApplicationTests {
 
     @Test
     public void testFindGenreById() {
-        Genre documentaryGenre = new Genre(5L,"Документальный");
+        Genre documentaryGenre = new Genre(5L, "Документальный");
         Optional<Genre> genreOptional = Optional.ofNullable(genreStorage
                 .findGenreById(documentaryGenre.getId()));
         assertThat(genreOptional)
