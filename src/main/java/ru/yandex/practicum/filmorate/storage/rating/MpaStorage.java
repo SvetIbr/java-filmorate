@@ -21,7 +21,7 @@ public interface MpaStorage {
     /**
      * Метод получения рейтинга по идентификатору из хранилища сервиса
      *
-     * @param id идентификатор
+     * @param id идентификатор рейтинга
      * @return копию объекта rating с указанным идентификатором
      */
     Mpa findMpaById(Long id);

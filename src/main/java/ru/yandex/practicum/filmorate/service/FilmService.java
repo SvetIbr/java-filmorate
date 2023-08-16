@@ -132,7 +132,7 @@ public class FilmService {
     /**
      * Метод получения фильма по идентификатору из хранилища сервиса
      *
-     * @param id идентификатор
+     * @param id идентификатор фильма
      * @return копию объекта film с указанным идентификатором
      */
     public Film getFilmById(Long id) {
@@ -147,9 +147,9 @@ public class FilmService {
     /**
      * Метод добавления лайка в список лайков фильма
      *
-     * @param idFilm,idUser идентификатор фильма, которому добавляется лайк,
-     *                      идентификатор пользователя user,
-     *                      который ставит лайк {@link ru.yandex.practicum.filmorate.model.User}
+     * @param idFilm - идентификатор фильма, которому добавляется лайк
+     * @param idUser - идентификатор пользователя user,
+     *               который ставит лайк {@link ru.yandex.practicum.filmorate.model.User}
      */
     public void addLikeToFilm(Long idFilm, Long idUser) {
         checkUserId(idUser);
@@ -169,9 +169,9 @@ public class FilmService {
     /**
      * Метод удаления добавленного лайка у фильма
      *
-     * @param idFilm,idUser идентификатор фильма, у которого удаляют лайк,
-     *                      идентификатор пользователя user,
-     *                      который удаляет лайк {@link ru.yandex.practicum.filmorate.model.User}
+     * @param idFilm - идентификатор фильма, у которого удаляют лайк
+     * @param idUser - идентификатор пользователя user,
+     *               который удаляет лайк {@link ru.yandex.practicum.filmorate.model.User}
      */
     public void deleteLikeFromFilm(Long idFilm, Long idUser) {
         checkUserId(idUser);
@@ -214,7 +214,7 @@ public class FilmService {
     /**
      * Метод проверки наличия в хранилище фильмов фильма по идентификатору
      *
-     * @param id идентификатор
+     * @param id идентификатор фильма
      */
     private void checkFilmId(Long id) {
         Film film = storage.getFilmById(id);
@@ -226,7 +226,7 @@ public class FilmService {
     /**
      * Метод проверки наличия в хранилище пользователей пользователя по идентификатору
      *
-     * @param id идентификатор
+     * @param id идентификатор пользователя
      */
     private void checkUserId(Long id) {
         User user = userStorage.getUserById(id);

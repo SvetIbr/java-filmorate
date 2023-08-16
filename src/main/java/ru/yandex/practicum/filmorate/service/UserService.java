@@ -32,7 +32,8 @@ public class UserService {
 
     /**
      * Конструктор - создание нового объекта с определенными значениями
-     * @param storage - хранилище пользователей
+     *
+     * @param storage   - хранилище пользователей
      * @param validator - валидатор пользователей
      */
     public UserService(@Qualifier("userDbStorage") UserStorage storage, UserValidator validator) {
@@ -112,13 +113,13 @@ public class UserService {
     /**
      * Метод получения пользователя по идентификатору из хранилища сервиса
      *
-     * @param id идентификатор
+     * @param id идентификатор пользователя
      * @return копию объекта user с указанным идентификатором
      */
     public User getUserById(Long id) {
         User user = storage.getUserById(id);
         if (user == null) {
-            throw new NotFoundException("Пользователь с идентификтором " + id + " не найден");
+            throw new NotFoundException("Пользователь с идентификатором " + id + " не найден");
         }
         user.setFriends(storage.getIdFriendsByUser(user));
         return user;
@@ -127,8 +128,8 @@ public class UserService {
     /**
      * Метод добавления пользователей в список друзей друг друга
      *
-     * @param idUser,idFriend идентификатор пользователя, который отправляет запрос на добавление,
-     *                        идентификатор пользователя, которого добавляют в друзья
+     * @param idUser - идентификатор пользователя, который отправляет запрос на добавление
+     * @param idFriend - идентификатор пользователя, которого добавляют в друзья
      */
     public void addToFriends(Long idUser, Long idFriend) {
         checkUserId(idUser);
@@ -140,14 +141,14 @@ public class UserService {
         }
         // Eсли пользователь еще не отправлял запрос и ему не был отправлен встречный запрос
         if (!storage.checkFriendship(idUser, idFriend, false)
-        && !storage.checkFriendship(idFriend, idUser, false)) {
+                && !storage.checkFriendship(idFriend, idUser, false)) {
             storage.addToFriends(idUser, idFriend);
             log.info("Пользователь " + idUser
                     + " добавлен в друзья пользователю" + idFriend);
         }
         // Eсли пользователь отправляет взаимный запрос и попадает в друзья
         if (storage.checkFriendship(idFriend, idUser, false)) {
-            storage.acceptToFriends(idUser, idFriend);
+            storage.acceptToFriends(idFriend, idUser);
             log.info("Пользователь " + idUser
                     + " одобрил заявку в друзья пользователю" + idFriend);
         }
@@ -156,8 +157,8 @@ public class UserService {
     /**
      * Метод удаления пользователей из списка друзей друг друга
      *
-     * @param idUser,idFriend идентификатор пользователя, который отправляет запрос на удаление,
-     *                        идентификатор пользователя, которого удаляют из друзей
+     * @param idUser   - идентификатор пользователя, который отправляет запрос на удаление
+     * @param idFriend - идентификатор пользователя, которого удаляют из друзей
      */
     public void deleteFromFriends(Long idUser, Long idFriend) {
         checkUserId(idUser);
@@ -165,7 +166,6 @@ public class UserService {
         // Eсли пользователь не отправлял запрос
         if (!storage.checkFriendship(idUser, idFriend, false)) {
             log.warn("Пользователь " + idUser + " не отправлял запрос в друзья пользователю " + idFriend);
-            return;
         }
         // Eсли пользователь отправлял запрос и его не одобрили
         if (storage.checkFriendship(idUser, idFriend, false)) {
@@ -174,11 +174,15 @@ public class UserService {
                     + " удалился из друзей у " + idFriend);
         }
         // Eсли пользователь был в друзьях
-        if (storage.checkFriendship(idUser, idFriend, true)
-        || storage.checkFriendship(idFriend, idUser, true)) {
+        if (storage.checkFriendship(idUser, idFriend, true)) {
             storage.deleteFromConfirmFriends(idUser, idFriend);
             log.info("Пользователь " + idUser
                     + " удалился из друзей у " + idFriend);
+        }
+        if (storage.checkFriendship(idFriend, idUser, true)) {
+            storage.deleteFromConfirmFriends(idFriend, idUser);
+            log.info("Пользователь " + idFriend
+                    + " удалился из друзей у " + idUser);
         }
     }
 
@@ -198,8 +202,8 @@ public class UserService {
     /**
      * Метод получения списка общих друзей двух пользователей из хранилища сервиса
      *
-     * @param idUser,otherId идентификатор пользователя, который запрашивает список общих друзей,
-     *                       идентификатор пользователя, с которым идет поиск общих друзей
+     * @param idUser  - идентификатор пользователя, который запрашивает список общих друзей
+     * @param otherId - идентификатор пользователя, с которым идет поиск общих друзей
      * @return список общих друзей двух пользователей
      */
     public List<User> getCommonFriends(Long idUser, Long otherId) {
@@ -213,7 +217,7 @@ public class UserService {
     /**
      * Метод проверки наличия в хранилище пользователей пользователя по идентификатору
      *
-     * @param id идентификатор
+     * @param id идентификатор пользователя
      */
     private void checkUserId(Long id) {
         User user = storage.getUserById(id);

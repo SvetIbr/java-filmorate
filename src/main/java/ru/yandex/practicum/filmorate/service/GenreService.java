@@ -43,7 +43,7 @@ public class GenreService {
     /**
      * Метод получения жанра по идентификатору из хранилища сервиса
      *
-     * @param id идентификатор
+     * @param id идентификатор жанра
      * @return копию объекта genre с указанным идентификатором
      */
     public Genre findGenreById(Long id) {

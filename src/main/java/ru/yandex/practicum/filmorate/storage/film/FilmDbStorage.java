@@ -68,6 +68,8 @@ public class FilmDbStorage implements FilmStorage {
     public void deleteAllFilms() {
         String sql = "DELETE FROM films";
         jdbcTemplate.update(sql);
+        String sql1 = "ALTER TABLE films ALTER COLUMN film_id RESTART WITH 1";
+        jdbcTemplate.update(sql1);
     }
 
     public Film getFilmById(Long id) {
@@ -94,7 +96,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public List<Film> getPopularFilm(Integer count) {
-        String sql = "SELECT * " +
+        String sql = "SELECT f.film_id, f.name, f.description, f.release_date, f.duration, f.rating_id " +
                 "FROM films AS f " +
                 "LEFT JOIN films_likes AS fl ON f.film_id = fl.film_id " +
                 "GROUP BY f.film_id " +

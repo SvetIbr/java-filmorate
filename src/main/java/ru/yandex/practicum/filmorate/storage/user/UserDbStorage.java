@@ -54,6 +54,8 @@ public class UserDbStorage implements UserStorage {
     public void deleteAllUsers() {
         String sql = "DELETE FROM users";
         jdbcTemplate.update(sql);
+        String sql1 = "ALTER TABLE users ALTER COLUMN user_id RESTART WITH 1";
+        jdbcTemplate.update(sql1);
     }
 
     public User getUserById(Long id) {
@@ -79,10 +81,10 @@ public class UserDbStorage implements UserStorage {
         String sql = "SELECT u.user_id, u.name, u.email, u.login, u.birthday " +
                 "FROM users u " +
                 "WHERE u.user_id IN " +
-                "(SELECT fr.user_id2 " +
-                "FROM friendship fr " +
-                "WHERE fr.user_id1 = ?)";
-        return jdbcTemplate.query(sql, this::makeUser, idUser);
+                "((SELECT user_id2 id FROM friendship  WHERE user_id1 = ?) " +
+                "UNION " +
+                "(SELECT user_id1 id FROM friendship  WHERE user_id2 = ? AND  confirmed = true))";
+        return jdbcTemplate.query(sql, this::makeUser, idUser, idUser);
     }
 
     public List<User> getCommonFriends(Long idUser, Long otherId) {
@@ -120,19 +122,18 @@ public class UserDbStorage implements UserStorage {
         return rows.next();
     }
 
-    public void acceptToFriends(Long idUser, Long idFriend) {
+    public void acceptToFriends(Long idFriend, Long idUser) {
         String sql = "UPDATE friendship " +
                      "SET user_id1 = ?, user_id2 = ?, confirmed = ? " +
                      "WHERE user_id1 = ? AND user_id2 = ?";
-        jdbcTemplate.update(sql, idUser, idFriend, true, idUser, idFriend);
-
+        jdbcTemplate.update(sql, idFriend, idUser, true, idFriend, idUser);
     }
 
     public void deleteFromConfirmFriends(Long idUser, Long idFriend) {
         String sql = "UPDATE friendship " +
                      "SET user_id1 = ?, user_id2 = ?, confirmed = ? " +
                      "WHERE user_id1 = ? AND user_id2 = ?";
-        jdbcTemplate.update(sql, idFriend, idUser, false, idFriend, idUser);
+        jdbcTemplate.update(sql, idUser,idFriend, false, idUser, idFriend);
     }
 
     private User makeUser(ResultSet rs, int rowNum) throws SQLException {

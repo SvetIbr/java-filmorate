@@ -10,17 +10,19 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Component
-public class MpaDbStorage implements MpaStorage{
+public class MpaDbStorage implements MpaStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     public MpaDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+
     public List<Mpa> findAllMpa() {
         String sql = "SELECT * FROM ratings ORDER BY rating_id";
         return jdbcTemplate.query(sql, this::makeMpa);
     }
+
     public Mpa findMpaById(Long id) {
         String sql = "SELECT * FROM ratings WHERE rating_id = ?";
         List<Mpa> result = jdbcTemplate.query(sql, this::makeMpa, id);

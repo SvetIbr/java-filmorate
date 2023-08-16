@@ -43,7 +43,7 @@ public class MpaService {
     /**
      * Метод получения рейтинга по идентификатору из хранилища сервиса
      *
-     * @param id идентификатор
+     * @param id идентификатор рейтинга
      * @return копию объекта rating с указанным идентификатором
      */
     public Mpa findMpaById(Long id) {

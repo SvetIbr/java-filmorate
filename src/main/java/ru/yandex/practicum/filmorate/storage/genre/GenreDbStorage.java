@@ -27,13 +27,6 @@ public class GenreDbStorage implements GenreStorage {
         return new HashSet<>(genres);
     }
 
-    private Genre makeGenre(ResultSet resultSet, int rowNum) throws SQLException {
-        Genre genre = new Genre();
-        genre.setId(resultSet.getLong("GENRE_ID"));
-        genre.setName(resultSet.getString("NAME"));
-        return genre;
-    }
-
     public List<Genre> findAllGenres() {
         String sql = "SELECT * FROM genres ORDER BY genre_id";
         return jdbcTemplate.query(sql, this::makeGenre);
@@ -58,5 +51,12 @@ public class GenreDbStorage implements GenreStorage {
             jdbcTemplate.update("INSERT INTO films_genres (film_id, genre_id) VALUES (?, ?)",
                     film.getId(), genre.getId());
         }
+    }
+
+    private Genre makeGenre(ResultSet resultSet, int rowNum) throws SQLException {
+        Genre genre = new Genre();
+        genre.setId(resultSet.getLong("GENRE_ID"));
+        genre.setName(resultSet.getString("NAME"));
+        return genre;
     }
 }
