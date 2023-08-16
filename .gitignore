@@ -79,4 +79,3 @@ build/
 .vscode/
 
 *.db
-db/*
