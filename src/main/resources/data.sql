@@ -1,4 +1,4 @@
-INSERT INTO ratings (rating_id, name, description)
+MERGE INTO ratings (rating_id, name, description)
     VALUES (1, 'G', 'У фильма нет возрастных ограничений'),
     (2, 'PG', 'Детям рекомендуется смотреть фильм с родителями'),
     (3, 'PG-13', 'Детям до 13 лет просмотр нежелателен'),
@@ -6,7 +6,7 @@ INSERT INTO ratings (rating_id, name, description)
     (5, 'NC-17', 'Лицам до 18 лет просмотр запрещён');
 
 
-INSERT INTO genres (genre_id, name)
+MERGE INTO genres (genre_id, name)
     VALUES (1, 'Комедия'),
     (2, 'Драма'),
     (3, 'Мультфильм'),
