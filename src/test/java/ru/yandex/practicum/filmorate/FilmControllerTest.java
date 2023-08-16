@@ -41,16 +41,17 @@ public class FilmControllerTest {
     private Film filmWithoutId;
 
     @BeforeEach
-    public void beforeEach(){
+    public void beforeEach() {
         mpa.setId(1L);
         mpa.setName("G");
         mpa.setDescription("У фильма нет возрастных ограничений");
         filmWithId = new Film("title", "description",
-                LocalDate.of(1994, 1, 18), 180,mpa);
+                LocalDate.of(1994, 1, 18), 180, mpa);
         filmWithId.setId(1L);
         filmWithoutId = new Film("title", "description",
                 LocalDate.of(1994, 1, 18), 180, mpa);
     }
+
     @AfterEach
     public void afterEach() throws Exception {
         mockMvc.perform(delete("/films"));
