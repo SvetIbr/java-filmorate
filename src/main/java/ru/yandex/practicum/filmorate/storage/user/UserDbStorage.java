@@ -44,8 +44,8 @@ public class UserDbStorage implements UserStorage {
 
     public User updateUser(User user) {
         String sql = "UPDATE users " +
-                     "SET login = ?, email = ?, name = ?, birthday = ? " +
-                     "WHERE user_id = ?";
+                "SET login = ?, email = ?, name = ?, birthday = ? " +
+                "WHERE user_id = ?";
         jdbcTemplate.update(sql, user.getLogin(), user.getEmail(),
                 user.getName(), user.getBirthday(), user.getId());
         return user;
@@ -124,16 +124,16 @@ public class UserDbStorage implements UserStorage {
 
     public void acceptToFriends(Long idFriend, Long idUser) {
         String sql = "UPDATE friendship " +
-                     "SET user_id1 = ?, user_id2 = ?, confirmed = ? " +
-                     "WHERE user_id1 = ? AND user_id2 = ?";
+                "SET user_id1 = ?, user_id2 = ?, confirmed = ? " +
+                "WHERE user_id1 = ? AND user_id2 = ?";
         jdbcTemplate.update(sql, idFriend, idUser, true, idFriend, idUser);
     }
 
     public void deleteFromConfirmFriends(Long idUser, Long idFriend) {
         String sql = "UPDATE friendship " +
-                     "SET user_id1 = ?, user_id2 = ?, confirmed = ? " +
-                     "WHERE user_id1 = ? AND user_id2 = ?";
-        jdbcTemplate.update(sql, idUser,idFriend, false, idUser, idFriend);
+                "SET user_id1 = ?, user_id2 = ?, confirmed = ? " +
+                "WHERE user_id1 = ? AND user_id2 = ?";
+        jdbcTemplate.update(sql, idUser, idFriend, false, idUser, idFriend);
     }
 
     private User makeUser(ResultSet rs, int rowNum) throws SQLException {
