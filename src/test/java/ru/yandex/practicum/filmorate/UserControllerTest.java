@@ -33,13 +33,14 @@ public class UserControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     private final User userWithId = new User("mail@mail.ru", "login", "name",
             LocalDate.of(1994, 1, 18));
-    private final User userWithoutId = new User( "mail@mail.ru", "login", "name",
+    private final User userWithoutId = new User("mail@mail.ru", "login", "name",
             LocalDate.of(1994, 1, 18));
 
     @BeforeEach
-    public void beforeEach(){
+    public void beforeEach() {
         userWithId.setId(1L);
     }
+
     @AfterEach
     public void afterEach() throws Exception {
         mockMvc.perform(delete("/users"));
