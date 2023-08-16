@@ -104,7 +104,7 @@ public class UserDbStorage implements UserStorage {
         return jdbcTemplate.query(sql, this::makeUser, idUser, otherId);
     }
 
-    public Set<Long> getIdFriendsByUser (User user) {
+    public Set<Long> getIdFriendsByUser(User user) {
         String sql = "(SELECT user_id2 id FROM friendship  WHERE user_id1 = ?) " +
                 "UNION (SELECT user_id1 id FROM friendship  WHERE user_id2 = ? AND  confirmed = true)";
         SqlRowSet sqlRowSet = jdbcTemplate.queryForRowSet(sql, user.getId(), user.getId());
