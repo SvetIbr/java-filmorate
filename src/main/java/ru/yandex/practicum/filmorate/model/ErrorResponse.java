@@ -13,8 +13,7 @@ public class ErrorResponse {
     /**
      * Поле ошибка
      * -- GETTER --
-     *  Метод получения значения поля error
-     *
+     * Метод получения значения поля error
      */
     private final String error;
 

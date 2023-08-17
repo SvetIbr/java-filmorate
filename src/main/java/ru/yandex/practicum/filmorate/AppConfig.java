@@ -27,7 +27,7 @@ public class AppConfig {
     private String driverClassName;
 
     @Value("${spring.datasource.url}")
-    String url;
+    private String url;
 
     @Value("${spring.datasource.username}")
     private String username;
