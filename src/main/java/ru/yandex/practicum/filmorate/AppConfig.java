@@ -23,8 +23,17 @@ import javax.sql.DataSource;
 @PropertySource(value = {"classpath:application.properties"})
 public class AppConfig {
 
-    @Value("${init-db:false}")
-    private String initDatabase;
+    @Value("${spring.datasource.driverClassName}")
+    private String driverClassName;
+
+    @Value("${spring.datasource.url}")
+    String url;
+
+    @Value("${spring.datasource.username}")
+    private String username;
+
+    @Value("${spring.datasource.password}")
+    private String password;
 
     @Bean
     public static PropertySourcesPlaceholderConfigurer placeHolderConfigurer() {
@@ -44,10 +53,10 @@ public class AppConfig {
     @Bean
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("org.h2.Driver");
-        dataSource.setUrl("jdbc:h2:file:./db/filmorate");
-        dataSource.setUsername("sa");
-        dataSource.setPassword("password");
+        dataSource.setDriverClassName(driverClassName);
+        dataSource.setUrl(url);
+        dataSource.setUsername(username);
+        dataSource.setPassword(password);
         return dataSource;
     }
 
@@ -58,7 +67,7 @@ public class AppConfig {
         ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
         databasePopulator.addScript(new ClassPathResource("data.sql"));
         dataSourceInitializer.setDatabasePopulator(databasePopulator);
-        dataSourceInitializer.setEnabled(Boolean.parseBoolean(initDatabase));
+        dataSourceInitializer.setEnabled(false);
         return dataSourceInitializer;
     }
 }

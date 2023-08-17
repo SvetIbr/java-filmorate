@@ -8,11 +8,7 @@ import lombok.*;
  * @version 1.0
  * @autor Светлана Ибраева
  */
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
-@RequiredArgsConstructor
+@Data
 @AllArgsConstructor
 public class Genre {
     /**
