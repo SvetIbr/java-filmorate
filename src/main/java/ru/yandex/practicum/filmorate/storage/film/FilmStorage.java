@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Интерфейс хранилища пользователей
@@ -50,18 +51,18 @@ public interface FilmStorage {
     /**
      * Метод добавления лайка в список лайков фильма из хранилища
      *
-     * @param idFilm,idUser идентификатор фильма, которому добавляется лайк,
-     *                      идентификатор пользователя user,
-     *                      который ставит лайк {@link ru.yandex.practicum.filmorate.model.User}
+     * @param idFilm - идентификатор фильма, которому добавляется лайк,
+     * @param idUser - идентификатор пользователя user,
+     *               который ставит лайк {@link ru.yandex.practicum.filmorate.model.User}
      */
     void addLikeToFilm(Long idFilm, Long idUser);
 
     /**
      * Метод удаления добавленного лайка у фильма из хранилища
      *
-     * @param idFilm,idUser идентификатор фильма, у которого удаляют лайк,
-     *                      идентификатор пользователя user,
-     *                      который удаляет лайк {@link ru.yandex.practicum.filmorate.model.User}
+     * @param idFilm - идентификатор фильма, у которого удаляют лайк,
+     * @param idUser - идентификатор пользователя user,
+     *               который удаляет лайк {@link ru.yandex.practicum.filmorate.model.User}
      */
     void deleteLikeFromFilm(Long idFilm, Long idUser);
 
@@ -72,4 +73,21 @@ public interface FilmStorage {
      * @return список фильмов, сформированных по количеству лайков
      */
     List<Film> getPopularFilm(Integer count);
+
+    /**
+     * Метод получения списка лайков фильма по идентификатору
+     *
+     * @param film {@link Film}
+     * @return список лайков фильма
+     */
+    Set<Long> getLikesByFilm(Film film);
+
+    /**
+     * Метод проверки наличия у фильма лайка от пользователя
+     *
+     * @param idFilm - идентификатор фильма, которому хотят поставить лайк,
+     * @param idUser - идентификатор пользователя, который хочет
+     *               поставить лайк {@link ru.yandex.practicum.filmorate.model.User}
+     */
+    boolean checkLike(Long idFilm, Long idUser);
 }

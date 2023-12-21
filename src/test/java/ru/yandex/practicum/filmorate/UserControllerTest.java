@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,8 +18,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -32,10 +31,15 @@ public class UserControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-    private final User userWithId = new User(1L, "mail@mail.ru", "login", "name",
-            LocalDate.of(1994, 1, 18), new HashSet<>());
-    private final User userWithoutId = new User(0L, "mail@mail.ru", "login", "name",
-            LocalDate.of(1994, 1, 18), new HashSet<>());
+    private final User userWithId = new User("mail@mail.ru", "login", "name",
+            LocalDate.of(1994, 1, 18));
+    private final User userWithoutId = new User("mail@mail.ru", "login", "name",
+            LocalDate.of(1994, 1, 18));
+
+    @BeforeEach
+    public void beforeEach() {
+        userWithId.setId(1L);
+    }
 
     @AfterEach
     public void afterEach() throws Exception {
@@ -136,8 +140,8 @@ public class UserControllerTest {
 
     @Test
     public void createUserWithEmptyName() throws Exception {
-        User user = new User(0L, "mail@mail.ru", "login", " ",
-                LocalDate.of(1994, 1, 18), new HashSet<>());
+        User user = new User("mail@mail.ru", "login", " ",
+                LocalDate.of(1994, 1, 18));
 
         var requestBuilder = post("/users")
                 .content(objectMapper.writeValueAsString(user))
@@ -148,8 +152,9 @@ public class UserControllerTest {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        User user1 = new User(1L, "mail@mail.ru", "login", "login",
-                LocalDate.of(1994, 1, 18), new HashSet<>());
+        User user1 = new User("mail@mail.ru", "login", "login",
+                LocalDate.of(1994, 1, 18));
+        user1.setId(1L);
 
         String actualResponseBody = mvcResult
                 .getResponse()
@@ -170,8 +175,8 @@ public class UserControllerTest {
 
     @Test
     public void createUserWithFailEmail() throws Exception {
-        User user = new User(0L, "mail.ru", "login", "name",
-                LocalDate.of(1994, 1, 18), new HashSet<>());
+        User user = new User("mail.ru", "login", "name",
+                LocalDate.of(1994, 1, 18));
 
         var requestBuilder = post("/users")
                 .content(objectMapper.writeValueAsString(user))
@@ -195,8 +200,8 @@ public class UserControllerTest {
 
     @Test
     public void createUserWithEmptyEmail() throws Exception {
-        User user = new User(0L, "", "login", "name",
-                LocalDate.of(1994, 1, 18), new HashSet<>());
+        User user = new User("", "login", "name",
+                LocalDate.of(1994, 1, 18));
 
         var requestBuilder = post("/users")
                 .content(objectMapper.writeValueAsString(user))
@@ -220,8 +225,8 @@ public class UserControllerTest {
 
     @Test
     public void createUserWithFailLogin() throws Exception {
-        User user = new User(0L, "mail@mail.ru", "login log", "name",
-                LocalDate.of(1994, 1, 18), new HashSet<>());
+        User user = new User("mail@mail.ru", "login log", "name",
+                LocalDate.of(1994, 1, 18));
 
         var requestBuilder = post("/users")
                 .content(objectMapper.writeValueAsString(user))
@@ -245,8 +250,8 @@ public class UserControllerTest {
 
     @Test
     public void createUserWithEmptyLogin() throws Exception {
-        User user = new User(0L, "mail@mail.ru", " ", "name",
-                LocalDate.of(1994, 1, 18), new HashSet<>());
+        User user = new User("mail@mail.ru", " ", "name",
+                LocalDate.of(1994, 1, 18));
 
         var requestBuilder = post("/users")
                 .content(objectMapper.writeValueAsString(user))
@@ -270,8 +275,8 @@ public class UserControllerTest {
 
     @Test
     public void createUserWithFailBirthday() throws Exception {
-        User user = new User(0L, "mail@mail.ru", "login", "name",
-                LocalDate.of(2024, 1, 18), new HashSet<>());
+        User user = new User("mail@mail.ru", "login", "name",
+                LocalDate.of(2024, 1, 18));
 
         var requestBuilder = post("/users")
                 .content(objectMapper.writeValueAsString(user))
@@ -297,8 +302,9 @@ public class UserControllerTest {
     public void updateUserWithValidFields() throws Exception {
         createUser();
 
-        User updateUser = new User(1L, "mail1@mail.ru", "updateLogin", "update name",
-                LocalDate.of(1994, 1, 19), new HashSet<>());
+        User updateUser = new User("mail1@mail.ru", "updateLogin", "update name",
+                LocalDate.of(1994, 1, 19));
+        updateUser.setId(1L);
 
         var requestBuilder = put("/users")
                 .content(objectMapper.writeValueAsString(updateUser))
@@ -330,8 +336,9 @@ public class UserControllerTest {
     public void updateUserWithFailId() throws Exception {
         createUser();
 
-        User updateUser = new User(2L, "mail1@mail.ru", "updateLogin", "update name",
-                LocalDate.of(1994, 1, 19), new HashSet<>());
+        User updateUser = new User("mail1@mail.ru", "updateLogin", "update name",
+                LocalDate.of(1994, 1, 19));
+        updateUser.setId(2L);
 
         var requestBuilder = put("/users")
                 .content(objectMapper.writeValueAsString(updateUser))
@@ -347,7 +354,7 @@ public class UserControllerTest {
                 .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Пользователя с идентификатором 2 нет")));
+                .writeValueAsString(new ErrorResponse("Пользователь с идентификатором 2 не найден")));
 
         getListUsersMustHaveNotUpdateUser();
     }
@@ -356,8 +363,9 @@ public class UserControllerTest {
     public void updateUserWithEmptyEmail() throws Exception {
         createUser();
 
-        User updateUser = new User(1L, "", "updateLogin", "update name",
-                LocalDate.of(1994, 1, 19), new HashSet<>());
+        User updateUser = new User("", "updateLogin", "update name",
+                LocalDate.of(1994, 1, 19));
+        updateUser.setId(1L);
 
         var requestBuilder = put("/users")
                 .content(objectMapper.writeValueAsString(updateUser))
@@ -383,8 +391,9 @@ public class UserControllerTest {
     public void updateUserWithFailEmail() throws Exception {
         createUser();
 
-        User updateUser = new User(1L, "mail", "updateLogin", "update name",
-                LocalDate.of(1994, 1, 19), new HashSet<>());
+        User updateUser = new User("mail", "updateLogin", "update name",
+                LocalDate.of(1994, 1, 19));
+        updateUser.setId(1L);
 
         var requestBuilder = put("/users")
                 .content(objectMapper.writeValueAsString(updateUser))
@@ -410,8 +419,9 @@ public class UserControllerTest {
     public void updateUserWithFailLogin() throws Exception {
         createUser();
 
-        User updateUser = new User(1L, "mail@mail.ru", "update login", "update name",
-                LocalDate.of(1994, 1, 19), new HashSet<>());
+        User updateUser = new User("mail@mail.ru", "update login", "update name",
+                LocalDate.of(1994, 1, 19));
+        updateUser.setId(1L);
 
         var requestBuilder = put("/users")
                 .content(objectMapper.writeValueAsString(updateUser))
@@ -437,8 +447,9 @@ public class UserControllerTest {
     public void updateUserWithFailBirthday() throws Exception {
         createUser();
 
-        User updateUser = new User(1L, "mail@mail.ru", "updateLogin", "update name",
-                LocalDate.of(2023, 12, 19), new HashSet<>());
+        User updateUser = new User("mail@mail.ru", "updateLogin", "update name",
+                LocalDate.of(2023, 12, 19));
+        updateUser.setId(1L);
 
         var requestBuilder = put("/users")
                 .content(objectMapper.writeValueAsString(updateUser))
@@ -454,7 +465,8 @@ public class UserControllerTest {
                 .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Дата рождения пользователя не может быть в будущем")));
+                .writeValueAsString(new ErrorResponse("Дата рождения " +
+                        "пользователя не может быть в будущем")));
 
         getListUsersMustHaveNotUpdateUser();
     }
@@ -496,7 +508,8 @@ public class UserControllerTest {
                 .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Пользователя с идентификатором 4 нет")));
+                .writeValueAsString(new ErrorResponse("Пользователь " +
+                        "с идентификатором 4 не найден")));
 
         var checkListFilmsRequest = get("/users")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -512,8 +525,8 @@ public class UserControllerTest {
     public void addToFriendAndGetFriendsWithValidId() throws Exception {
         createUser();
 
-        User friend = new User(0L, "mail@mail.ru", "login", "name",
-                LocalDate.of(1994, 1, 18), new HashSet<>());
+        User friend = new User("mailFriend@mail.ru", "loginFriend", "name",
+                LocalDate.of(1994, 1, 18));
 
         var requestBuilderForCreateFriend = post("/users")
                 .content(objectMapper.writeValueAsString(friend))
@@ -529,46 +542,6 @@ public class UserControllerTest {
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk());
 
-        var requestBuilderForCheckFriend = get("/users/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON);
-
-        MvcResult mvcResult = mockMvc.perform(requestBuilderForCheckFriend)
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String actualResponseBody = mvcResult
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
-
-        Set<Long> friends = new HashSet<>();
-        friends.add(2L);
-        User userWithFriend = new User(1L, "mail@mail.ru", "login", "name",
-                LocalDate.of(1994, 1, 18), friends);
-
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(userWithFriend));
-
-        var requestBuilderForCheckFriend1 = get("/users/2")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON);
-
-        MvcResult mvcResult1 = mockMvc.perform(requestBuilderForCheckFriend1)
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String actualResponseBody1 = mvcResult1
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
-
-        Set<Long> friends1 = new HashSet<>();
-        friends1.add(1L);
-        User friendWithUser = new User(2L, "mail@mail.ru", "login", "name",
-                LocalDate.of(1994, 1, 18), friends1);
-
-        assertThat(actualResponseBody1).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(friendWithUser));
-
         var requestBuilderForCheckFriendsByUser = get("/users/1/friends")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);
@@ -581,8 +554,13 @@ public class UserControllerTest {
                 .getResponse()
                 .getContentAsString(StandardCharsets.UTF_8);
 
+        User userWithoutFriend = new User("mailFriend@mail.ru",
+                "loginFriend", "name",
+                LocalDate.of(1994, 1, 18));
+        userWithoutFriend.setId(2L);
+
         assertThat(actualResponseBody2).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(Collections.singletonList(friendWithUser)));
+                objectMapper.writeValueAsString(Collections.singletonList(userWithoutFriend)));
 
         var requestBuilderForCheckFriendsByFriend = get("/users/2/friends")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -597,7 +575,7 @@ public class UserControllerTest {
                 .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody3).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(Collections.singletonList(userWithFriend)));
+                objectMapper.writeValueAsString(Collections.emptyList()));
 
     }
 
@@ -605,8 +583,8 @@ public class UserControllerTest {
     public void addToFriendWithFailId() throws Exception {
         createUser();
 
-        User friend = new User(0L, "mail@mail.ru", "login",
-                "name", LocalDate.of(1994, 1, 18), new HashSet<>());
+        User friend = new User("mailFriend@mail.ru", "loginFriend",
+                "name", LocalDate.of(1994, 1, 18));
 
         var requestBuilderForCreateFriend = post("/users")
                 .content(objectMapper.writeValueAsString(friend))
@@ -629,15 +607,16 @@ public class UserControllerTest {
                 .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Пользователя с идентификатором 3 нет")));
+                .writeValueAsString(new ErrorResponse("Пользователь " +
+                        "с идентификатором 3 не найден")));
     }
 
     @Test
     public void addToFriendWithFailIdFriend() throws Exception {
         createUser();
 
-        User friend = new User(0L, "mail@mail.ru", "login", "name",
-                LocalDate.of(1994, 1, 18), new HashSet<>());
+        User friend = new User("mailFriend@mail.ru", "loginFriend", "name",
+                LocalDate.of(1994, 1, 18));
 
         var requestBuilderForCreateFriend = post("/users")
                 .content(objectMapper.writeValueAsString(friend))
@@ -660,15 +639,16 @@ public class UserControllerTest {
                 .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Пользователя с идентификатором 7 нет")));
+                .writeValueAsString(new ErrorResponse("Пользователь " +
+                        "с идентификатором 7 не найден")));
     }
 
     @Test
     public void deleteFromFriendAndGetFriendsWithValidId() throws Exception {
         createUser();
 
-        User friend = new User(0L, "mail@mail.ru", "login", "name",
-                LocalDate.of(1994, 1, 18), new HashSet<>());
+        User friend = new User("mailFriend@mail.ru", "loginFriend", "name",
+                LocalDate.of(1994, 1, 18));
 
         var requestBuilderForCreateFriend = post("/users")
                 .content(objectMapper.writeValueAsString(friend))
@@ -677,6 +657,16 @@ public class UserControllerTest {
 
         mockMvc.perform(requestBuilderForCreateFriend);
 
+        User friend2 = new User("mailFriend2@mail.ru", "loginFriend2", "name",
+                LocalDate.of(1994, 1, 18));
+
+        var requestBuilderForCreateFriend2 = post("/users")
+                .content(objectMapper.writeValueAsString(friend2))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(requestBuilderForCreateFriend2);
+
         var requestBuilder = put("/users/1/friends/2")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);
@@ -684,47 +674,19 @@ public class UserControllerTest {
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk());
 
+        var requestBuilder2 = put("/users/1/friends/3")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
 
-        var requestBuilderForDelete = delete("/users/2/friends/1")
+        mockMvc.perform(requestBuilder2)
+                .andExpect(status().isOk());
+
+        var requestBuilderForDelete = delete("/users/1/friends/2")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(requestBuilderForDelete)
                 .andExpect(status().isOk());
-
-
-        var requestBuilderForCheckFriend = get("/users/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON);
-
-        MvcResult mvcResult = mockMvc.perform(requestBuilderForCheckFriend)
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String actualResponseBody = mvcResult
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
-
-        assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(userWithId));
-
-        var requestBuilderForCheckFriend1 = get("/users/2")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON);
-
-        MvcResult mvcResult1 = mockMvc.perform(requestBuilderForCheckFriend1)
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String actualResponseBody1 = mvcResult1
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
-
-        User friendWithoutUser = new User(2L, "mail@mail.ru", "login", "name",
-                LocalDate.of(1994, 1, 18), new HashSet<>());
-
-        assertThat(actualResponseBody1).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(friendWithoutUser));
 
         var requestBuilderForCheckFriendsByUser = get("/users/1/friends")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -738,31 +700,20 @@ public class UserControllerTest {
                 .getResponse()
                 .getContentAsString(StandardCharsets.UTF_8);
 
+        User friend3 = new User("mailFriend2@mail.ru", "loginFriend2", "name",
+                LocalDate.of(1994, 1, 18));
+        friend3.setId(3L);
+
         assertThat(actualResponseBody2).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(Collections.emptyList()));
-
-        var requestBuilderForCheckFriendsByFriend = get("/users/2/friends")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON);
-
-        MvcResult mvcResult3 = mockMvc.perform(requestBuilderForCheckFriendsByFriend)
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String actualResponseBody3 = mvcResult3
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
-
-        assertThat(actualResponseBody3).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(Collections.emptyList()));
+                .writeValueAsString(Collections.singletonList(friend3)));
     }
 
     @Test
     public void deleteFromFriendWithFailId() throws Exception {
         createUser();
 
-        User friend = new User(0L, "mail@mail.ru", "login", "name",
-                LocalDate.of(1994, 1, 18), new HashSet<>());
+        User friend = new User("mailFriend@mail.ru", "loginFriend", "name",
+                LocalDate.of(1994, 1, 18));
 
         var requestBuilderForCreateFriend = post("/users")
                 .content(objectMapper.writeValueAsString(friend))
@@ -792,47 +743,8 @@ public class UserControllerTest {
                 .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Пользователя с идентификатором 3 нет")));
-
-        var requestBuilderForCheckFriend = get("/users/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON);
-
-        MvcResult mvcResult1 = mockMvc.perform(requestBuilderForCheckFriend)
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String actualResponseBody1 = mvcResult1
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
-
-        Set<Long> friends = new HashSet<>();
-        friends.add(2L);
-        User userWithIdAndFriend = new User(1L, "mail@mail.ru", "login",
-                "name", LocalDate.of(1994, 1, 18), friends);
-
-        assertThat(actualResponseBody1).isEqualToIgnoringWhitespace(
-                objectMapper.writeValueAsString(userWithIdAndFriend));
-
-        var requestBuilderForCheckFriend1 = get("/users/2")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON);
-
-        MvcResult mvcResult2 = mockMvc.perform(requestBuilderForCheckFriend1)
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String actualResponseBody2 = mvcResult2
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
-
-        Set<Long> friends1 = new HashSet<>();
-        friends1.add(1L);
-        User friendWithIdAndUser = new User(2L, "mail@mail.ru", "login",
-                "name", LocalDate.of(1994, 1, 18), friends1);
-
-        assertThat(actualResponseBody2).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(friendWithIdAndUser));
+                .writeValueAsString(new ErrorResponse("Пользователь " +
+                        "с идентификатором 3 не найден")));
 
         var requestBuilderForCheckFriendsByUser = get("/users/1/friends")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -846,31 +758,19 @@ public class UserControllerTest {
                 .getResponse()
                 .getContentAsString(StandardCharsets.UTF_8);
 
+        User friend1 = new User("mailFriend@mail.ru", "loginFriend", "name",
+                LocalDate.of(1994, 1, 18));
+        friend1.setId(2L);
         assertThat(actualResponseBody3).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(Collections.singletonList(friendWithIdAndUser)));
-
-        var requestBuilderForCheckFriendsByFriend = get("/users/2/friends")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON);
-
-        MvcResult mvcResult4 = mockMvc.perform(requestBuilderForCheckFriendsByFriend)
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String actualResponseBody4 = mvcResult4
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
-
-        assertThat(actualResponseBody4).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(Collections.singletonList(userWithIdAndFriend)));
+                .writeValueAsString(Collections.singletonList(friend1)));
     }
 
     @Test
     public void deleteFromFriendWithFailIdFriend() throws Exception {
         createUser();
 
-        User friend = new User(0L, "mail@mail.ru", "login", "name",
-                LocalDate.of(1994, 1, 18), new HashSet<>());
+        User friend = new User("mailFriend@mail.ru", "loginFriend", "name",
+                LocalDate.of(1994, 1, 18));
 
         var requestBuilderForCreateFriend = post("/users")
                 .content(objectMapper.writeValueAsString(friend))
@@ -899,47 +799,8 @@ public class UserControllerTest {
                 .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Пользователя с идентификатором 3 нет")));
-
-        var requestBuilderForCheckFriend = get("/users/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON);
-
-        MvcResult mvcResult1 = mockMvc.perform(requestBuilderForCheckFriend)
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String actualResponseBody1 = mvcResult1
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
-
-        Set<Long> friends = new HashSet<>();
-        friends.add(2L);
-        User userWithIdAndFriend = new User(1L, "mail@mail.ru", "login", "name",
-                LocalDate.of(1994, 1, 18), friends);
-
-        assertThat(actualResponseBody1).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(userWithIdAndFriend));
-
-        var requestBuilderForCheckFriend1 = get("/users/2")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON);
-
-        MvcResult mvcResult2 = mockMvc.perform(requestBuilderForCheckFriend1)
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String actualResponseBody2 = mvcResult2
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
-
-        Set<Long> friends1 = new HashSet<>();
-        friends1.add(1L);
-        User friendWithUser = new User(2L, "mail@mail.ru", "login", "name",
-                LocalDate.of(1994, 1, 18), friends1);
-
-        assertThat(actualResponseBody2).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(friendWithUser));
+                .writeValueAsString(new ErrorResponse("Пользователь " +
+                        "с идентификатором 3 не найден")));
 
         var requestBuilderForCheckFriendsByUser = get("/users/1/friends")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -953,23 +814,11 @@ public class UserControllerTest {
                 .getResponse()
                 .getContentAsString(StandardCharsets.UTF_8);
 
+        User friend1 = new User("mailFriend@mail.ru", "loginFriend", "name",
+                LocalDate.of(1994, 1, 18));
+        friend1.setId(2L);
         assertThat(actualResponseBody3).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(Collections.singletonList(friendWithUser)));
-
-        var requestBuilderForCheckFriendsByFriend = get("/users/2/friends")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON);
-
-        MvcResult mvcResult4 = mockMvc.perform(requestBuilderForCheckFriendsByFriend)
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String actualResponseBody4 = mvcResult4
-                .getResponse()
-                .getContentAsString(StandardCharsets.UTF_8);
-
-        assertThat(actualResponseBody4).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(Collections.singletonList(userWithIdAndFriend)));
+                .writeValueAsString(Collections.singletonList(friend1)));
     }
 
 
@@ -977,8 +826,8 @@ public class UserControllerTest {
     public void getEmptyCommonFriend() throws Exception {
         createUser();
 
-        User friend = new User(0L, "mail@mail.ru", "login", "name",
-                LocalDate.of(1994, 1, 18), new HashSet<>());
+        User friend = new User("mailFriend@mail.ru", "loginFriend", "name",
+                LocalDate.of(1994, 1, 18));
 
         var requestBuilderForCreateFriend = post("/users")
                 .content(objectMapper.writeValueAsString(friend))
@@ -1008,8 +857,8 @@ public class UserControllerTest {
     public void getCommonFriendWithValidId() throws Exception {
         createUser();
 
-        User friend = new User(0L, "mail@mail.ru", "login", "friend",
-                LocalDate.of(1994, 1, 18), new HashSet<>());
+        User friend = new User("mailFriend@mail.ru", "loginFriend", "friend",
+                LocalDate.of(1994, 1, 18));
 
         var requestBuilderForCreateFriend = post("/users")
                 .content(objectMapper.writeValueAsString(friend))
@@ -1018,8 +867,9 @@ public class UserControllerTest {
 
         mockMvc.perform(requestBuilderForCreateFriend);
 
-        User commonFriend = new User(0L, "mail@mail.ru", "login", "common",
-                LocalDate.of(1994, 1, 18), new HashSet<>());
+        User commonFriend = new User("mailCommonFriend@mail.ru",
+                "loginCommonFriend", "common",
+                LocalDate.of(1994, 1, 18));
 
         var requestBuilderForCreateCommonFriend = post("/users")
                 .content(objectMapper.writeValueAsString(commonFriend))
@@ -1057,14 +907,12 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
-        Set<Long> friends = new HashSet<>();
-        friends.add(1L);
-        friends.add(2L);
-
-        User commonFriend1 = new User(3L, "mail@mail.ru", "login",
-                "common", LocalDate.of(1994, 1, 18), friends);
+        User commonFriend1 = new User("mailCommonFriend@mail.ru", "loginCommonFriend",
+                "common", LocalDate.of(1994, 1, 18));
+        commonFriend1.setId(3L);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(Collections.singletonList(commonFriend1)));
@@ -1102,4 +950,3 @@ public class UserControllerTest {
         mockMvc.perform(requestBuilder);
     }
 }
-

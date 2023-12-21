@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -13,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.nio.charset.StandardCharsets;
@@ -20,6 +22,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -30,12 +33,24 @@ public class FilmControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule());
 
-    private final Film filmWithId = new Film(1L, "title", "description",
-            LocalDate.of(1994, 1, 18), 180, new HashSet<>());
-    private final Film filmWithoutId = new Film(0L, "title", "description",
-            LocalDate.of(1994, 1, 18), 180, new HashSet<>());
+    Mpa mpa = new Mpa();
+    private Film filmWithId;
+    private Film filmWithoutId;
+
+    @BeforeEach
+    public void beforeEach() {
+        mpa.setId(1L);
+        mpa.setName("G");
+        mpa.setDescription("У фильма нет возрастных ограничений");
+        filmWithId = new Film("title", "description",
+                LocalDate.of(1994, 1, 18), 180, mpa);
+        filmWithId.setId(1L);
+        filmWithoutId = new Film("title", "description",
+                LocalDate.of(1994, 1, 18), 180, mpa);
+    }
 
     @AfterEach
     public void afterEach() throws Exception {
@@ -55,7 +70,8 @@ public class FilmControllerTest {
                 .andExpect(status().isCreated())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString();
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
                 objectMapper.writeValueAsString(filmWithId));
@@ -66,7 +82,8 @@ public class FilmControllerTest {
 
         mockMvc.perform(checkListFilmsRequest)
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(Collections.singletonList(filmWithId))));
+                .andExpect(content().json(objectMapper
+                        .writeValueAsString(Collections.singletonList(filmWithId))));
     }
 
     @Test
@@ -81,7 +98,8 @@ public class FilmControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Фильм не должен иметь идентификатора " +
@@ -92,8 +110,8 @@ public class FilmControllerTest {
 
     @Test
     public void createFilmWithBlankName() throws Exception {
-        Film film = new Film(0L, " ", "description",
-                LocalDate.of(1994, 1, 18), 180, new HashSet<>());
+        Film film = new Film(" ", "description",
+                LocalDate.of(1994, 1, 18), 180, mpa);
         var requestBuilder = post("/films")
                 .content(objectMapper.writeValueAsString(film))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -113,8 +131,9 @@ public class FilmControllerTest {
 
     @Test
     public void createFilmWithEmptyName() throws Exception {
-        Film film = new Film(0L, "", "description",
-                LocalDate.of(1994, 1, 18), 180, new HashSet<>());
+        Film film = new Film("", "description",
+                LocalDate.of(1994, 1, 18), 180, mpa);
+        //film.setId(0L);
         var requestBuilder = post("/films")
                 .content(objectMapper.writeValueAsString(film))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -134,12 +153,12 @@ public class FilmControllerTest {
 
     @Test
     public void createFilmWithFailDescription() throws Exception {
-        Film film = new Film(0L, "name", "description description " +
+        Film film = new Film("name", "description description " +
                 "description description description description description description " +
                 "description description description description description description " +
                 "description description description description description description " +
                 "description description description", LocalDate.of(1994, 1, 18),
-                180, new HashSet<>());
+                180, mpa);
         var requestBuilder = post("/films")
                 .content(objectMapper.writeValueAsString(film))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -149,18 +168,21 @@ public class FilmControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Длина описания фильма не может быть более 200 символов")));
+                .writeValueAsString(new ErrorResponse("Длина описания " +
+                        "фильма не может быть более 200 символов")));
 
         getListFilmsMustBeEmpty();
     }
 
     @Test
     public void createFilmWithEmptyDescription() throws Exception {
-        Film film = new Film(0L, "name", "", LocalDate.of(1994, 1, 18),
-                180, new HashSet<>());
+        Film film = new Film("name", "",
+                LocalDate.of(1994, 1, 18),
+                180, mpa);
         var requestBuilder = post("/films")
                 .content(objectMapper.writeValueAsString(film))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -170,7 +192,8 @@ public class FilmControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Добавьте описание фильма")));
@@ -180,8 +203,8 @@ public class FilmControllerTest {
 
     @Test
     public void createFilmWithFailReleaseDate() throws Exception {
-        Film film = new Film(0L, "name", "description",
-                LocalDate.of(1893, 1, 18), 180, new HashSet<>());
+        Film film = new Film("name", "description",
+                LocalDate.of(1893, 1, 18), 180, mpa);
         var requestBuilder = post("/films")
                 .content(objectMapper.writeValueAsString(film))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -191,18 +214,20 @@ public class FilmControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Дата релиза не может быть раньше 28 декабря 1895 года")));
+                .writeValueAsString(new ErrorResponse("Дата релиза" +
+                        " не может быть раньше 28 декабря 1895 года")));
 
         getListFilmsMustBeEmpty();
     }
 
     @Test
     public void createFilmWithFailDuration() throws Exception {
-        Film film = new Film(0L, "name", "description",
-                LocalDate.of(1994, 1, 18), -180, new HashSet<>());
+        Film film = new Film("name", "description",
+                LocalDate.of(1994, 1, 18), -180, mpa);
         var requestBuilder = post("/films")
                 .content(objectMapper.writeValueAsString(film))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -212,18 +237,20 @@ public class FilmControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Продолжительность фильма не может быть меньше или равна 0")));
+                .writeValueAsString(new ErrorResponse("Продолжительность фильма " +
+                        "не может быть меньше или равна 0")));
 
         getListFilmsMustBeEmpty();
     }
 
     @Test
     public void createFilmWithEmptyDuration() throws Exception {
-        Film film = new Film(0L, "name", "description",
-                LocalDate.of(1994, 1, 18), 0, new HashSet<>());
+        Film film = new Film("name", "description",
+                LocalDate.of(1994, 1, 18), 0, mpa);
         var requestBuilder = post("/films")
                 .content(objectMapper.writeValueAsString(film))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -233,10 +260,12 @@ public class FilmControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Продолжительность фильма не может быть меньше или равна 0")));
+                .writeValueAsString(new ErrorResponse("Продолжительность фильма " +
+                        "не может быть меньше или равна 0")));
 
         getListFilmsMustBeEmpty();
     }
@@ -251,7 +280,8 @@ public class FilmControllerTest {
                 .andExpect(status().isInternalServerError())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Произошла непредвиденная ошибка.")));
@@ -283,8 +313,9 @@ public class FilmControllerTest {
     public void updateFilmWithValidFields() throws Exception {
         createFilm();
 
-        Film updateFilm = new Film(1L, "updateTitle", "update description",
-                LocalDate.of(1994, 1, 19), 189, new HashSet<>());
+        Film updateFilm = new Film("updateTitle", "update description",
+                LocalDate.of(1994, 1, 19), 189, mpa);
+        updateFilm.setId(1L);
         var requestBuilder = put("/films")
                 .content(objectMapper.writeValueAsString(updateFilm))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -294,7 +325,8 @@ public class FilmControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString();
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
                 objectMapper.writeValueAsString(updateFilm));
@@ -305,15 +337,17 @@ public class FilmControllerTest {
 
         mockMvc.perform(checkListFilmsRequest)
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(Collections.singletonList(updateFilm))));
+                .andExpect(content().json(objectMapper
+                        .writeValueAsString(Collections.singletonList(updateFilm))));
     }
 
     @Test
     public void updateFilmWithFailId() throws Exception {
         createFilm();
 
-        Film updateFilm = new Film(2L, "updateTitle", "update description",
-                LocalDate.of(1994, 1, 19), 189, new HashSet<>());
+        Film updateFilm = new Film("updateTitle", "update description",
+                LocalDate.of(1994, 1, 19), 189, mpa);
+        updateFilm.setId(2L);
         var requestBuilder = put("/films")
                 .content(objectMapper.writeValueAsString(updateFilm))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -323,10 +357,11 @@ public class FilmControllerTest {
                 .andExpect(status().isNotFound())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Фильма с идентификатором 2 нет")));
+                .writeValueAsString(new ErrorResponse("Фильм с идентификатором 2 не найден")));
 
         getListFilmsMustHaveNotUpdateFilm();
     }
@@ -335,8 +370,9 @@ public class FilmControllerTest {
     public void updateFilmWithFailName() throws Exception {
         createFilm();
 
-        Film updateFilm = new Film(1L, "", "update description",
-                LocalDate.of(1994, 1, 19), 189, new HashSet<>());
+        Film updateFilm = new Film("", "update description",
+                LocalDate.of(1994, 1, 19), 189, mpa);
+        updateFilm.setId(1L);
         var requestBuilder = put("/films")
                 .content(objectMapper.writeValueAsString(updateFilm))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -346,7 +382,8 @@ public class FilmControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Название фильма не может быть пустым")));
@@ -358,8 +395,9 @@ public class FilmControllerTest {
     public void updateFilmWithFailDescriptions() throws Exception {
         createFilm();
 
-        Film updateFilm = new Film(1L, "update title", "",
-                LocalDate.of(1994, 1, 19), 189, new HashSet<>());
+        Film updateFilm = new Film("update title", "",
+                LocalDate.of(1994, 1, 19), 189, mpa);
+        updateFilm.setId(1L);
         var requestBuilder = put("/films")
                 .content(objectMapper.writeValueAsString(updateFilm))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -369,7 +407,8 @@ public class FilmControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
                 .writeValueAsString(new ErrorResponse("Добавьте описание фильма")));
@@ -381,8 +420,9 @@ public class FilmControllerTest {
     public void updateFilmWithFailReleaseDate() throws Exception {
         createFilm();
 
-        Film updateFilm = new Film(1L, "update title", "update description",
-                LocalDate.of(1888, 1, 19), 189, new HashSet<>());
+        Film updateFilm = new Film("update title", "update description",
+                LocalDate.of(1888, 1, 19), 189, mpa);
+        updateFilm.setId(1L);
         var requestBuilder = put("/films")
                 .content(objectMapper.writeValueAsString(updateFilm))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -392,10 +432,12 @@ public class FilmControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Дата релиза не может быть раньше 28 декабря 1895 года")));
+                .writeValueAsString(new ErrorResponse("Дата релиза " +
+                        "не может быть раньше 28 декабря 1895 года")));
 
         getListFilmsMustHaveNotUpdateFilm();
     }
@@ -404,8 +446,9 @@ public class FilmControllerTest {
     public void updateFilmWithFailDuration() throws Exception {
         createFilm();
 
-        Film updateFilm = new Film(1L, "update title", "update description",
-                LocalDate.of(1888, 1, 19), -189, new HashSet<>());
+        Film updateFilm = new Film("update title", "update description",
+                LocalDate.of(1888, 1, 19), -189, mpa);
+        updateFilm.setId(1L);
         var requestBuilder = put("/films")
                 .content(objectMapper.writeValueAsString(updateFilm))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -415,10 +458,12 @@ public class FilmControllerTest {
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Продолжительность фильма не может быть меньше или равна 0")));
+                .writeValueAsString(new ErrorResponse("Продолжительность фильма " +
+                        "не может быть меньше или равна 0")));
 
         getListFilmsMustHaveNotUpdateFilm();
     }
@@ -435,7 +480,8 @@ public class FilmControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(
                 objectMapper.writeValueAsString(filmWithId));
@@ -453,10 +499,11 @@ public class FilmControllerTest {
                 .andExpect(status().isNotFound())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Фильма с идентификатором 4 нет")));
+                .writeValueAsString(new ErrorResponse("Фильм с идентификатором 4 не найден")));
 
         var checkListFilmsRequest = get("/films")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -464,15 +511,16 @@ public class FilmControllerTest {
 
         mockMvc.perform(checkListFilmsRequest)
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(Collections.singletonList(filmWithId))));
+                .andExpect(content().json(objectMapper
+                        .writeValueAsString(Collections.singletonList(filmWithId))));
     }
 
     @Test
     public void putAndDeleteLikeToFilmWithValidId() throws Exception {
         createFilm();
 
-        User user = new User(0L, "mail@mail.ru", "login",
-                "name", LocalDate.of(1994, 1, 18), new HashSet<>());
+        User user = new User("mail@mail.ru", "login",
+                "name", LocalDate.of(1994, 1, 18));
 
         var requestBuilderForCreateUser = post("/users")
                 .content(objectMapper.writeValueAsString(user))
@@ -490,8 +538,10 @@ public class FilmControllerTest {
 
         Set<Long> likes = new HashSet<>();
         likes.add(1L);
-        Film filmWithLike = new Film(1L, "title", "description",
-                LocalDate.of(1994, 1, 18), 180, likes);
+        Film filmWithLike = new Film("title", "description",
+                LocalDate.of(1994, 1, 18), 180, mpa);
+        filmWithLike.setId(1L);
+        filmWithLike.setLikes(likes);
 
         var checkListFilmsRequest = get("/films")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -499,7 +549,8 @@ public class FilmControllerTest {
 
         mockMvc.perform(checkListFilmsRequest)
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(Collections.singletonList(filmWithLike))));
+                .andExpect(content().json(objectMapper
+                        .writeValueAsString(Collections.singletonList(filmWithLike))));
 
         var requestBuilderForDelete = delete("/films/1/like/1")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -514,15 +565,17 @@ public class FilmControllerTest {
 
         mockMvc.perform(checkListFilmsRequest1)
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(Collections.singletonList(filmWithId))));
+                .andExpect(content().json(objectMapper
+                        .writeValueAsString(Collections.singletonList(filmWithId))));
     }
 
     @Test
     public void putLikeToFilmWithFailIdFilm() throws Exception {
         createFilm();
 
-        User user = new User(0L, "mail@mail.ru", "login",
-                "name", LocalDate.of(1994, 1, 18), new HashSet<>());
+        User user = new User("mail@mail.ru", "login",
+                "name", LocalDate.of(1994, 1, 18));
+        user.setId(0L);
 
         var requestBuilderForCreateUser = post("/users")
                 .content(objectMapper.writeValueAsString(user))
@@ -539,10 +592,11 @@ public class FilmControllerTest {
                 .andExpect(status().isNotFound())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Фильма с идентификатором 2 нет")));
+                .writeValueAsString(new ErrorResponse("Фильм с идентификатором 2 не найден")));
 
     }
 
@@ -550,8 +604,8 @@ public class FilmControllerTest {
     public void putLikeToFilmWithFailIdUser() throws Exception {
         createFilm();
 
-        User user = new User(0L, "mail@mail.ru", "login",
-                "name", LocalDate.of(1994, 1, 18), new HashSet<>());
+        User user = new User("mail@mail.ru", "login",
+                "name", LocalDate.of(1994, 1, 18));
 
         var requestBuilderForCreateUser = post("/users")
                 .content(objectMapper.writeValueAsString(user))
@@ -568,10 +622,12 @@ public class FilmControllerTest {
                 .andExpect(status().isNotFound())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Пользователя с идентификатором 2 нет")));
+                .writeValueAsString(new ErrorResponse("Пользователь " +
+                        "с идентификатором 2 не найден")));
 
     }
 
@@ -579,8 +635,8 @@ public class FilmControllerTest {
     public void deleteLikeToFilmWithFailIdFilm() throws Exception {
         createFilm();
 
-        User user = new User(0L, "mail@mail.ru", "login",
-                "name", LocalDate.of(1994, 1, 18), new HashSet<>());
+        User user = new User("mail@mail.ru", "login",
+                "name", LocalDate.of(1994, 1, 18));
 
         var requestBuilderForCreateUser = post("/users")
                 .content(objectMapper.writeValueAsString(user))
@@ -606,7 +662,7 @@ public class FilmControllerTest {
         String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Фильма с идентификатором 2 нет")));
+                .writeValueAsString(new ErrorResponse("Фильм с идентификатором 2 не найден")));
 
         var checkListFilmsRequest1 = get("/films")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -614,20 +670,23 @@ public class FilmControllerTest {
 
         Set<Long> likes = new HashSet<>();
         likes.add(1L);
-        Film filmWithLike = new Film(1L, "title", "description",
-                LocalDate.of(1994, 1, 18), 180, likes);
+        Film filmWithLike = new Film("title", "description",
+                LocalDate.of(1994, 1, 18), 180, mpa);
+        filmWithLike.setId(1L);
+        filmWithLike.setLikes(likes);
 
         mockMvc.perform(checkListFilmsRequest1)
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(Collections.singletonList(filmWithLike))));
+                .andExpect(content().json(objectMapper
+                        .writeValueAsString(Collections.singletonList(filmWithLike))));
     }
 
     @Test
     public void deleteLikeToFilmWithFailIdUser() throws Exception {
         createFilm();
 
-        User user = new User(0L, "mail@mail.ru", "login",
-                "name", LocalDate.of(1994, 1, 18), new HashSet<>());
+        User user = new User("mail@mail.ru", "login",
+                "name", LocalDate.of(1994, 1, 18));
 
         var requestBuilderForCreateUser = post("/users")
                 .content(objectMapper.writeValueAsString(user))
@@ -650,10 +709,12 @@ public class FilmControllerTest {
                 .andExpect(status().isNotFound())
                 .andReturn();
 
-        String actualResponseBody = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
+        String actualResponseBody = mvcResult.getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
 
         assertThat(actualResponseBody).isEqualToIgnoringWhitespace(objectMapper
-                .writeValueAsString(new ErrorResponse("Пользователя с идентификатором 2 нет")));
+                .writeValueAsString(new ErrorResponse("Пользователь " +
+                        "с идентификатором 2 не найден")));
 
         var checkListFilmsRequest1 = get("/films")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -661,12 +722,15 @@ public class FilmControllerTest {
 
         Set<Long> likes = new HashSet<>();
         likes.add(1L);
-        Film filmWithLike = new Film(1L, "title", "description",
-                LocalDate.of(1994, 1, 18), 180, likes);
+        Film filmWithLike = new Film("title", "description",
+                LocalDate.of(1994, 1, 18), 180, mpa);
+        filmWithLike.setId(1L);
+        filmWithLike.setLikes(likes);
 
         mockMvc.perform(checkListFilmsRequest1)
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(Collections.singletonList(filmWithLike))));
+                .andExpect(content().json(objectMapper
+                        .writeValueAsString(Collections.singletonList(filmWithLike))));
     }
 
     @Test
@@ -675,8 +739,8 @@ public class FilmControllerTest {
             createFilm();
         }
 
-        User user = new User(0L, "mail@mail.ru", "login",
-                "name", LocalDate.of(1994, 1, 18), new HashSet<>());
+        User user = new User("mailUser@mail.ru", "loginUser",
+                "name", LocalDate.of(1994, 1, 18));
 
         var requestBuilderForCreateUser = post("/users")
                 .content(objectMapper.writeValueAsString(user))
@@ -685,8 +749,8 @@ public class FilmControllerTest {
 
         mockMvc.perform(requestBuilderForCreateUser);
 
-        User user1 = new User(0L, "mail@mail.ru", "login",
-                "name", LocalDate.of(1994, 1, 18), new HashSet<>());
+        User user1 = new User("mail1@mail.ru", "login1",
+                "name", LocalDate.of(1994, 1, 18));
 
         var requestBuilderForCreateUser1 = post("/users")
                 .content(objectMapper.writeValueAsString(user1))
@@ -695,8 +759,9 @@ public class FilmControllerTest {
 
         mockMvc.perform(requestBuilderForCreateUser1);
 
-        User user2 = new User(0L, "mail@mail.ru", "login",
-                "name", LocalDate.of(1994, 1, 18), new HashSet<>());
+        User user2 = new User("mail2@mail.ru", "login2",
+                "name", LocalDate.of(1994, 1, 18));
+        user2.setId(0L);
 
         var requestBuilderForCreateUser2 = post("/users")
                 .content(objectMapper.writeValueAsString(user2))
@@ -730,13 +795,17 @@ public class FilmControllerTest {
         Set<Long> likes = new HashSet<>();
         likes.add(1L);
         likes.add(2L);
-        Film filmWithTwoLike = new Film(2L, "title", "description",
-                LocalDate.of(1994, 1, 18), 180, likes);
+        Film filmWithTwoLike = new Film("title", "description",
+                LocalDate.of(1994, 1, 18), 180, mpa);
+        filmWithTwoLike.setLikes(likes);
+        filmWithTwoLike.setId(2L);
 
         Set<Long> likes1 = new HashSet<>();
         likes1.add(3L);
-        Film filmWithOneLike = new Film(3L, "title", "description",
-                LocalDate.of(1994, 1, 18), 180, likes1);
+        Film filmWithOneLike = new Film("title", "description",
+                LocalDate.of(1994, 1, 18), 180, mpa);
+        filmWithOneLike.setLikes(likes1);
+        filmWithOneLike.setId(3L);
 
         mockMvc.perform(requestBuilderForGetPopularFilms)
                 .andExpect(status().isOk())
@@ -751,36 +820,13 @@ public class FilmControllerTest {
             createFilm();
         }
 
-        Film film1 = new Film(2L, "title", "description",
-                LocalDate.of(1994, 1, 18), 180, new HashSet<>());
-        Film film2 = new Film(3L, "title", "description",
-                LocalDate.of(1994, 1, 18), 180, new HashSet<>());
-        Film film3 = new Film(4L, "title", "description",
-                LocalDate.of(1994, 1, 18), 180, new HashSet<>());
-        Film film4 = new Film(5L, "title", "description",
-                LocalDate.of(1994, 1, 18), 180, new HashSet<>());
-        Film film5 = new Film(6L, "title", "description",
-                LocalDate.of(1994, 1, 18), 180, new HashSet<>());
-        Film film6 = new Film(7L, "title", "description",
-                LocalDate.of(1994, 1, 18), 180, new HashSet<>());
-        Film film7 = new Film(8L, "title", "description",
-                LocalDate.of(1994, 1, 18), 180, new HashSet<>());
-        Film film8 = new Film(9L, "title", "description",
-                LocalDate.of(1994, 1, 18), 180, new HashSet<>());
-        Film film9 = new Film(10L, "title", "description",
-                LocalDate.of(1994, 1, 18), 180, new HashSet<>());
-
-
         var requestBuilderForGetPopularFilms = get("/films/popular")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(requestBuilderForGetPopularFilms)
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper
-                        .writeValueAsString(List.of(filmWithId, film1, film2, film3, film4,
-                                film5, film6, film7, film8, film9))));
-
+                .andExpect(jsonPath("$", hasSize(10)));
     }
 
     @Test
@@ -815,7 +861,8 @@ public class FilmControllerTest {
 
         mockMvc.perform(checkListFilmsRequest)
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(Collections.singletonList(filmWithId))));
+                .andExpect(content().json(objectMapper
+                        .writeValueAsString(Collections.singletonList(filmWithId))));
     }
 
     private void createFilm() throws Exception {

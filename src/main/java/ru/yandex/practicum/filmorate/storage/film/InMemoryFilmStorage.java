@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.*;
@@ -22,19 +21,20 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film createFilm(Film film) {
         film.setId(numberId);
         film.setLikes(new HashSet<>());
+        film.setGenres(new HashSet<>());
         films.put(film.getId(), film);
         numberId++;
-        log.info("Добавлен фильм: " + film);
         return film;
     }
 
     public Film updateFilm(Film film) {
-        checkId(film.getId());
         if (film.getLikes() == null) {
             film.setLikes(new HashSet<>());
         }
+        if (film.getGenres() == null) {
+            film.setGenres(new HashSet<>());
+        }
         films.put(film.getId(), film);
-        log.info("Обновлен фильм: " + film);
         return film;
     }
 
@@ -44,20 +44,15 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     public Film getFilmById(Long id) {
-        checkId(id);
-        return films.get(id);
+        return films.getOrDefault(id, null);
     }
 
     public void addLikeToFilm(Long idFilm, Long idUser) {
-        checkId(idFilm);
         films.get(idFilm).getLikes().add(idUser);
-        log.info("Фильму " + films.get(idFilm).getName() + " поставили лайк");
     }
 
     public void deleteLikeFromFilm(Long idFilm, Long idUser) {
-        checkId(idFilm);
         films.get(idFilm).getLikes().remove(idUser);
-        log.info("У фильма " + films.get(idFilm).getName() + " отменили свой лайк");
     }
 
     public List<Film> getPopularFilm(Integer count) {
@@ -67,10 +62,12 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .collect(Collectors.toList());
     }
 
-    private void checkId(Long id) {
-        if (!films.containsKey(id)) {
-            log.error(String.format("Фильма с идентификатором %d нет", id));
-            throw new NotFoundException(String.format("Фильма с идентификатором %d нет", id));
-        }
+    @Override
+    public Set<Long> getLikesByFilm(Film film) {
+        return films.get(film.getId()).getLikes();
+    }
+
+    public boolean checkLike(Long idFilm, Long idUser) {
+        return films.get(idFilm).getLikes().contains(idUser);
     }
 }
